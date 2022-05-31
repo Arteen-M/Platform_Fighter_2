@@ -32,7 +32,11 @@ class Square(pygame.sprite.Sprite):
         self.fall_speed = 3.6
         self.fast_fall = 5.6
         self.ground_acc = 0.6
+        self.lag_ground_acc = 0.1
+        self.current_ground_acc = self.ground_acc
         self.air_acc = 0.45
+        self.lag_air_acc = 0.4
+        self.current_air_acc = self.air_acc
         self.jump_acc = -4.8
 
         self.pos = vec(self.rect.midbottom[0], self.rect.midbottom[1])
@@ -104,23 +108,41 @@ class Square(pygame.sprite.Sprite):
 
     def move(self, walls):
         self.acc.x = 0
+        if self.lag <= 0:
+            self.current_ground_acc = self.ground_acc
+            self.current_air_acc = self.air_acc
+        else:
+            self.current_ground_acc = self.lag_ground_acc
+            self.current_air_acc = self.lag_air_acc
 
         wall_collide = pygame.sprite.spritecollide(self, walls, False)
 
         pressed_keys = pygame.key.get_pressed()
         if pressed_keys[self.left] and not wall_collide:
-            self.acc.x -= self.ground_acc
+            if self.on_ground:
+                self.acc.x -= self.current_ground_acc
+            else:
+                self.acc.x -= self.current_air_acc
         elif pressed_keys[self.left] and not wall_collide[0].direction == "LEFT":
-            self.acc.x -= self.ground_acc
+            if self.on_ground:
+                self.acc.x -= self.current_ground_acc
+            else:
+                self.acc.x -= self.current_air_acc
         elif pressed_keys[self.left] and wall_collide:
             if wall_collide[0].direction == "LEFT":
                 self.acc.x = 0
                 self.vel.x = 0
 
         if pressed_keys[self.right] and not wall_collide:
-            self.acc.x += self.ground_acc
+            if self.on_ground:
+                self.acc.x += self.current_ground_acc
+            else:
+                self.acc.x += self.current_air_acc
         elif pressed_keys[self.right] and not wall_collide[0].direction == "RIGHT":
-            self.acc.x += self.ground_acc
+            if self.on_ground:
+                self.acc.x += self.current_ground_acc
+            else:
+                self.acc.x += self.current_air_acc
         elif pressed_keys[self.right] and wall_collide:
             if wall_collide[0].direction == "RIGHT":
                 self.acc.x = 0
