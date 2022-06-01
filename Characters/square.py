@@ -94,8 +94,18 @@ class Square(pygame.sprite.Sprite):
         floor_collide = pygame.sprite.spritecollide(self, floors, False)
 
         if floor_collide:
+            if not self.on_ground:
+                self.lag = 0
+                for hitBox in self._active_hitboxes:
+                    hitBox.reset()
+
             self.on_ground = True
         else:
+            if self.on_ground:
+                self.lag = 0
+                for hitBox in self._active_hitboxes:
+                    hitBox.reset()
+
             self.on_ground = False
 
     def directionChange(self):
