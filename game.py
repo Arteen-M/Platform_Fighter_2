@@ -30,7 +30,9 @@ FramePerSec = pygame.time.Clock()
 display = pygame.display.set_mode((WIDTH,  HEIGHT))
 pygame.display.set_caption("Platform Fighter")
 
-P1 = square.Square(display)
+P1 = square.Square(display, color=RED, spawn_position=((WIDTH/2) - 200, HEIGHT/2))
+P2 = square.Square(display, color=BLUE, spawn_position=((WIDTH/2) + 200, HEIGHT/2), controls=(K_a, K_d, K_w, K_s, K_t))
+
 mainFloor = floor.Floor(display, dimensions=(WIDTH/2, 10), pos=(WIDTH/2, 400))
 
 mainLeftWall = wall.Wall(display, direction="LEFT", dimensions=(10, HEIGHT/2), pos=(600, 546))
@@ -57,6 +59,9 @@ while True:
 
     P1.draw()
     P1.update(hard_floors, walls)
+
+    P2.draw()
+    P2.update()
 
     for element in hard_floors:
         element.draw()
