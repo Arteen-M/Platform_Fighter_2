@@ -11,16 +11,15 @@ DARK_GRAY = (125, 125, 150)
 
 
 class HitBox(pygame.sprite.Sprite):
-    def __init__(self, size, display, active, lag, start_flag, end_flag, color=RED):
+    def __init__(self, size, display, lag, start_flag, end_flag, color=RED):
         super().__init__()
         self.surf = pygame.Surface(size)
         self.surf.set_alpha(100)
         self.rect = self.surf.get_rect(center=(0, 0))
         self.surf.fill(color)
 
-        self.num_active = active
         self._lag = lag
-        self.start_flag = lag - start_flag
+        self.start_flag = start_flag
         self.end_flag = end_flag
 
         self.count = self._lag
@@ -52,7 +51,8 @@ class HitBox(pygame.sprite.Sprite):
             self.running = False
             self.count = self._lag
 
-        self.draw()
+        if self._active:
+            self.draw()
 
     def draw(self):
         self.display.blit(self.surf, self.rect)

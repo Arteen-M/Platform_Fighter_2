@@ -63,11 +63,11 @@ class Square(pygame.sprite.Sprite):
 
         self.direction = True  # True = Right
 
-        self.n_attack = hitbox.HitBox((60, 60), self.display, 10, 20, 5, 5)
-        self.f_attack = hitbox.HitBox((20, 20), self.display, 10, 20, 5, 5)
-        self.b_attack = hitbox.HitBox((40, 15), self.display, 10, 20, 5, 5)
-        self.u_attack = hitbox.HitBox((40, 30), self.display, 10, 20, 5, 5)
-        self.d_attack = hitbox.HitBox((50, 30), self.display, 10, 20, 5, 5)
+        self.n_attack = hitbox.HitBox((60, 60), self.display, 20, 15, 5)
+        self.f_attack = hitbox.HitBox((20, 20), self.display, 20, 15, 5)
+        self.b_attack = hitbox.HitBox((40, 15), self.display, 20, 15, 5)
+        self.u_attack = hitbox.HitBox((40, 30), self.display, 20, 15, 5)
+        self.d_attack = hitbox.HitBox((50, 30), self.display, 20, 15, 5)
 
         self.all_hitboxes = [self.n_attack, self.f_attack, self.b_attack, self.u_attack, self.d_attack]
         self.active_hitboxes = pygame.sprite.Group()
@@ -186,6 +186,8 @@ class Square(pygame.sprite.Sprite):
                 self.tapped_up = False
             elif self.tapped_up and not self.on_ground and self.air_jumps <= 0:
                 self.tapped_up = False
+        else:
+            self.tapped_up = False
 
         if self.on_ground:
             self.air_jumps = self.max_jumps
@@ -268,13 +270,14 @@ class Square(pygame.sprite.Sprite):
         self.directionChange()
         self.move(walls)
         self.jump()
+        self.physicsUpdate()
         self.neutral_attack()
         self.forward_attack()
         self.back_attack()
         self.up_attack()
         self.down_attack()
         self.active_hitboxes_setter()
-        self.physicsUpdate()
+        self.draw()
 
 
 
