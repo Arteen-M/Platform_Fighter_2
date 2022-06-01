@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 from Characters.Character_Elements import hitbox
 import time
+import math
 
 vec = pygame.math.Vector2
 pygame.init()
@@ -40,6 +41,9 @@ class Square(pygame.sprite.Sprite):
         self.current_air_acc = self.air_acc
         self.jump_acc = -4.8
 
+        self.percentage = 0.0
+        self.weight = 80
+
         self.pos = vec(self.rect.midbottom[0], self.rect.midbottom[1])
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
@@ -63,11 +67,11 @@ class Square(pygame.sprite.Sprite):
 
         self.direction = True  # True = Right
 
-        self.n_attack = hitbox.HitBox((60, 60), self.display, 20, 15, 5)
-        self.f_attack = hitbox.HitBox((20, 20), self.display, 20, 15, 5)
-        self.b_attack = hitbox.HitBox((40, 15), self.display, 20, 15, 5)
-        self.u_attack = hitbox.HitBox((40, 30), self.display, 20, 15, 5)
-        self.d_attack = hitbox.HitBox((50, 30), self.display, 20, 15, 5)
+        self.n_attack = hitbox.HitBox((60, 60), self.display, 20, 15, 5, (math.sin(math.radians(45)), math.sin(math.radians(45))), 1, 1, 1, 1, self.color)
+        self.f_attack = hitbox.HitBox((20, 20), self.display, 20, 15, 5, (math.sin(math.radians(60)), math.sin(math.radians(30))), 1, 1, 1, 1, self.color)
+        self.b_attack = hitbox.HitBox((40, 15), self.display, 20, 15, 5, (math.sin(math.radians(60)), math.sin(math.radians(30))), 1, 1, 1, 1, self.color)
+        self.u_attack = hitbox.HitBox((40, 30), self.display, 20, 15, 5, (math.sin(math.radians(80)), math.sin(math.radians(10))), 1, 1, 1, 1, self.color)
+        self.d_attack = hitbox.HitBox((50, 30), self.display, 20, 15, 5, (math.sin(math.radians(90)), math.sin(math.radians(0))), 1, 1, 1, 1, self.color)
 
         self.all_hitboxes = [self.n_attack, self.f_attack, self.b_attack, self.u_attack, self.d_attack]
         self.active_hitboxes = pygame.sprite.Group()
@@ -80,6 +84,18 @@ class Square(pygame.sprite.Sprite):
     def countLag(self):
         if self.lag > 0:
             self.lag -= 1
+
+    def knockbackFormula(self, angle, damage, scale, base):
+        velocity = angle * (((((self.percentage / 10) + (self.percentage * (damage / 2) / 20) * (
+                (200 / (self.weight + 100)) * 1.4) + 18) * scale) + base))
+        return velocity
+
+    def hitstunFormula(self, velocity, hitstun, damage):
+        return round(velocity / (2 * self.gravity) - (2 * velocity) + (0.1 * self.percentage)) + hitstun + self.findHitstop(damage, 1)
+
+    @staticmethod
+    def findHitstop(damage, multiplyer):
+        return math.floor(((damage * 0.45) + 2) * multiplyer + 3)
 
     def setGravity(self, floors):
         floor_collide = pygame.sprite.spritecollide(self, floors, False)
@@ -192,14 +208,14 @@ class Square(pygame.sprite.Sprite):
         if self.on_ground:
             self.air_jumps = self.max_jumps
 
-    def active_hitboxes_setter(self):
+    def activeHitboxesSetter(self):
         for hitbox in self.all_hitboxes:
-            if hitbox.active:
+            if hitbox.count == hitbox.start_flag:
                 self.active_hitboxes.add(hitbox)
             elif not hitbox.active and self.active_hitboxes.has(hitbox):
                 self.active_hitboxes.remove(hitbox)
 
-    def neutral_attack(self):
+    def neutralAttack(self):
         pressed_keys = pygame.key.get_pressed()
 
         if pressed_keys[self.attack] and self.lag <= 0:
@@ -209,7 +225,7 @@ class Square(pygame.sprite.Sprite):
         elif self.n_attack.running:
             self.n_attack.update((self.pos.x, self.pos.y - 15))
 
-    def forward_attack(self):
+    def forwardAttack(self):
         pressed_keys = pygame.key.get_pressed()
 
         if pressed_keys[self.attack] and self.lag <= 0:
@@ -226,7 +242,7 @@ class Square(pygame.sprite.Sprite):
             else:
                 self.f_attack.update((self.pos.x - 30, self.pos.y - 15))
 
-    def back_attack(self):
+    def backAttack(self):
         pressed_keys = pygame.key.get_pressed()
 
         if pressed_keys[self.attack] and self.lag <= 0:
@@ -243,7 +259,7 @@ class Square(pygame.sprite.Sprite):
             else:
                 self.b_attack.update((self.pos.x + 35, self.pos.y - 15))
 
-    def up_attack(self):
+    def upAttack(self):
         pressed_keys = pygame.key.get_pressed()
 
         if pressed_keys[self.attack] and self.lag <= 0:
@@ -253,7 +269,7 @@ class Square(pygame.sprite.Sprite):
         elif self.u_attack.running:
             self.u_attack.update((self.pos.x, self.pos.y - 30))
 
-    def down_attack(self):
+    def downAttack(self):
         pressed_keys = pygame.key.get_pressed()
 
         if pressed_keys[self.attack] and self.lag <= 0:
@@ -263,7 +279,13 @@ class Square(pygame.sprite.Sprite):
         elif self.d_attack.running:
             self.d_attack.update(self.pos)
 
-    def update(self, hard_floors, walls):
+    def getHit(self, opponent_hitboxes):
+        hit = pygame.sprite.spritecollide(self, opponent_hitboxes, True)
+        if hit:
+            self.percentage += hit[0].damage
+            print(self.percentage)
+
+    def update(self, hard_floors, walls, opponent_hitboxes):
         self.countLag()
         self.setGravity(hard_floors)
         self.stateChange(hard_floors)
@@ -271,12 +293,13 @@ class Square(pygame.sprite.Sprite):
         self.move(walls)
         self.jump()
         self.physicsUpdate()
-        self.neutral_attack()
-        self.forward_attack()
-        self.back_attack()
-        self.up_attack()
-        self.down_attack()
-        self.active_hitboxes_setter()
+        self.neutralAttack()
+        self.forwardAttack()
+        self.backAttack()
+        self.upAttack()
+        self.downAttack()
+        self.activeHitboxesSetter()
+        self.getHit(opponent_hitboxes)
         self.draw()
 
 

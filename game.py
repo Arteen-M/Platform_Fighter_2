@@ -59,8 +59,8 @@ while True:
 
     display.fill(BLACK)
 
-    P1.update(hard_floors, walls)
-    P2.update(hard_floors, walls)
+    P1.update(hard_floors, walls, P2.active_hitboxes)
+    P2.update(hard_floors, walls, P1.active_hitboxes)
 
     for element in hard_floors:
         element.draw()

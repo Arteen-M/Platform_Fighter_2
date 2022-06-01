@@ -11,7 +11,7 @@ DARK_GRAY = (125, 125, 150)
 
 
 class HitBox(pygame.sprite.Sprite):
-    def __init__(self, size, display, lag, start_flag, end_flag, color=RED):
+    def __init__(self, size, display, lag, start_flag, end_flag, angle, damage, base, scale, hitstun, color=RED):
         super().__init__()
         self.surf = pygame.Surface(size)
         self.surf.set_alpha(100)
@@ -25,6 +25,13 @@ class HitBox(pygame.sprite.Sprite):
         self.count = self._lag
         self._active = False
         self.running = False
+
+        self.x_component = angle[0]
+        self.y_component = angle[1]
+        self.damage = damage
+        self.base_knockback = base
+        self.knockback_scale = scale
+        self.hitstun = hitstun
 
         self.display = display
 
