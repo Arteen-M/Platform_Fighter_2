@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 from Characters.Character_Elements import hitbox
+import time
 
 vec = pygame.math.Vector2
 pygame.init()
@@ -69,7 +70,7 @@ class Square(pygame.sprite.Sprite):
         self.d_attack = hitbox.HitBox((50, 30), self.display, 10, 20, 5, 5)
 
         self.all_hitboxes = [self.n_attack, self.f_attack, self.b_attack, self.u_attack, self.d_attack]
-        self._active_hitboxes = pygame.sprite.Group()
+        self.active_hitboxes = pygame.sprite.Group()
 
         self.lag = 0
 
@@ -96,15 +97,17 @@ class Square(pygame.sprite.Sprite):
         if floor_collide:
             if not self.on_ground:
                 self.lag = 0
-                for hitBox in self._active_hitboxes:
-                    hitBox.reset()
+                for hitBox in self.all_hitboxes:
+                    if hitBox.active:
+                        hitBox.reset()
 
             self.on_ground = True
         else:
             if self.on_ground:
                 self.lag = 0
-                for hitBox in self._active_hitboxes:
-                    hitBox.reset()
+                for hitBox in self.all_hitboxes:
+                    if hitBox.active:
+                        hitBox.reset()
 
             self.on_ground = False
 
@@ -187,17 +190,12 @@ class Square(pygame.sprite.Sprite):
         if self.on_ground:
             self.air_jumps = self.max_jumps
 
-    @property
-    def active_hitboxes(self):
-        return self._active_hitboxes
-
-    @active_hitboxes.setter
-    def active_hitboxes(self, all_hitboxes):
-        for hitbox in all_hitboxes:
+    def active_hitboxes_setter(self):
+        for hitbox in self.all_hitboxes:
             if hitbox.active:
-                self._active_hitboxes.add(hitbox)
-            elif not hitbox.active and self._active_hitboxes.has(hitbox):
-                self._active_hitboxes.remove(hitbox)
+                self.active_hitboxes.add(hitbox)
+            elif not hitbox.active and self.active_hitboxes.has(hitbox):
+                self.active_hitboxes.remove(hitbox)
 
     def neutral_attack(self):
         pressed_keys = pygame.key.get_pressed()
@@ -275,6 +273,7 @@ class Square(pygame.sprite.Sprite):
         self.back_attack()
         self.up_attack()
         self.down_attack()
+        self.active_hitboxes_setter()
         self.physicsUpdate()
 
 
