@@ -26,7 +26,8 @@ MOMENTUM_FRIC = 0.01
 
 
 class Square(pygame.sprite.Sprite):
-    def __init__(self, display, color=RED, spawn_position=(WIDTH/2, HEIGHT/2), controls=(K_LEFT, K_RIGHT, K_UP, K_DOWN, K_h)):
+    def __init__(self, display, color=RED, spawn_position=(WIDTH / 2, HEIGHT / 2),
+                 controls=(K_LEFT, K_RIGHT, K_UP, K_DOWN, K_h)):
         super().__init__()
         self.surf = pygame.Surface((30, 30))
         self.rect = self.surf.get_rect(midbottom=spawn_position)
@@ -63,17 +64,19 @@ class Square(pygame.sprite.Sprite):
         self.attack = self.controls[4]
 
         self.tapped_up = False
-        self.on_ground = False
         self.max_jumps = 4
         self.air_jumps = self.max_jumps
 
+        self.on_ground = False
         self.direction = True  # True = Right
+        self.invincibility = 0
+        self.frozen = 0
 
         # size, display, lag, start_flag, end_flag, direction, angle, damage, base, scale, hitstun, color=RED
         self.n_attack = hitbox.HitBox((60, 60), self.display, 20, 15, 5, 1, (0.5, 0.5), 5, 1, 0.25, 5, self.color)
         self.f_attack = hitbox.HitBox((20, 20), self.display, 20, 15, 5, 1, (0.65, 0.35), 7, 1.5, 0.2, 3, self.color)
         self.b_attack = hitbox.HitBox((40, 15), self.display, 20, 15, 5, 1, (-0.65, 0.35), 8, 0.5, 0.3, 3, self.color)
-        self.u_attack = hitbox.HitBox((40, 30), self.display, 20, 15, 5, 1, (0.15, 0.65), 4, 1, 0.25, 5, self.color)
+        self.u_attack = hitbox.HitBox((40, 30), self.display, 20, 15, 5, 1, (0.15, 0.7), 4, 1.2, 0.3, 5, self.color)
         self.d_attack = hitbox.HitBox((50, 30), self.display, 20, 15, 5, 1, (0.05, -0.6), 10, 1.5, 0.3, 5, self.color)
 
         self.all_hitboxes = [self.n_attack, self.f_attack, self.b_attack, self.u_attack, self.d_attack]
@@ -100,17 +103,35 @@ class Square(pygame.sprite.Sprite):
         if self.momentum > 0:
             self.momentum -= 1
 
+    def countInvincibility(self):
+        if self.invincibility > 0:
+            self.invincibility -= 1
+
+    def countFrozen(self):
+        if self.frozen > 0:
+            self.frozen -= 1
+
     def knockbackFormula(self, angle, damage, scale, base, mod):
         velocity = mod * angle * (((((self.percentage / 10) + (self.percentage * (damage / 2) / 20) * (
                 (200 / (self.weight + 100)) * 1.4) + 18) * scale) + base))
         return velocity
 
     def hitstunFormula(self, velocity, hitstun, damage):
-        return math.floor(velocity / (2 * self.gravity) - (2 * velocity) + (0.1 * self.percentage)) + hitstun + self.findHitstop(damage, 1)
+        return math.floor(
+            velocity / (2 * self.gravity) - (2 * velocity) + (0.1 * self.percentage)) + hitstun + self.findHitstop(
+            damage, 1)
 
     @staticmethod
     def findHitstop(damage, multiplyer):
         return math.floor(((damage * 0.45) + 2) * multiplyer + 3)
+
+    def respawn(self):
+        if self.pos.x > WIDTH + 20 or self.pos.x < -20 or self.pos.y < -20 or self.pos.y > HEIGHT + 20:
+            self.acc = vec(0, 0)
+            self.vel = vec(0, 0)
+            self.pos = vec(WIDTH / 2, HEIGHT / 2)
+            self.invincibility = 100
+            self.frozen = self.invincibility - 20
 
     def floorCollide(self, floors):
         floor_collide = pygame.sprite.spritecollide(self, floors, False)
@@ -261,7 +282,8 @@ class Square(pygame.sprite.Sprite):
         pressed_keys = pygame.key.get_pressed()
 
         if pressed_keys[self.attack] and self.lag <= 0:
-            if not (pressed_keys[self.right] or pressed_keys[self.left] or pressed_keys[self.up] or pressed_keys[self.down]):
+            if not (pressed_keys[self.right] or pressed_keys[self.left] or pressed_keys[self.up] or pressed_keys[
+                self.down]):
                 self.n_attack.update((self.pos.x, self.pos.y - 15))
                 self.lag = self.n_attack.lag
         elif self.n_attack.running:
@@ -328,8 +350,10 @@ class Square(pygame.sprite.Sprite):
 
             self.percentage += box.damage
 
-            self.knockback.x = self.knockbackFormula(box.x_component, box.damage, box.knockback_scale, box.base_knockback, 1)
-            self.knockback.y = -1 * self.knockbackFormula(box.y_component, box.damage, box.knockback_scale, box.base_knockback, 1)
+            self.knockback.x = self.knockbackFormula(box.x_component, box.damage, box.knockback_scale,
+                                                     box.base_knockback, 1)
+            self.knockback.y = -1 * self.knockbackFormula(box.y_component, box.damage, box.knockback_scale,
+                                                          box.base_knockback, 1)
 
             # self.vel = self.knockback
             self.acc = vec(box.direction * self.knockback.x / 10, self.knockback.y)
@@ -342,44 +366,46 @@ class Square(pygame.sprite.Sprite):
             print(self.hitstun, self.momentum)
 
     def update(self, hard_floors, walls, opponent_hitboxes):
-        # COUNTING FUNCTIONS
+        # RESPAWN FUNCTION (ALWAYS)
+        self.respawn()
+        # COUNTING FUNCTIONS (ALWAYS)
         self.countLag()
         self.countHitstun()
         self.countMomentum()
-        # COLLISION FUNCTIONS
-        self.floorCollide(hard_floors)
-        self.wallCollide(walls)
-        # STATE CHANGES
-        self.stateChange(hard_floors)
-        if not (self.lag or self.hitstun):
-            self.directionChange()
-        # MOVEMENTS
-        if not self.hitstun:
-            self.move(walls)
-            self.jump()
+        self.countInvincibility()
+        self.countFrozen()
+        if not self.frozen:
+            # COLLISION FUNCTIONS (CONDITIONAL)
+            self.floorCollide(hard_floors)
+            self.wallCollide(walls)
+            # STATE CHANGES (CONDITIONAL)
+            self.stateChange(hard_floors)
+            if not (self.lag or self.hitstun):
+                self.directionChange()
+            # MOVEMENTS (CONDITIONAL)
+            if not self.hitstun:
+                self.move(walls)
+                self.jump()
 
+        # ACC, VEL AND POS UPDATE (ALWAYS)
         self.physicsUpdate()
 
-        if not self.hitstun:
-            # ATTACKS
-            self.neutralAttack()
-            self.forwardAttack()
-            self.backAttack()
-            self.upAttack()
-            self.downAttack()
-        # HITBOXES
-        self.activeHitboxesSetter()
-        # GETTING HIT
-        self.getHit(opponent_hitboxes)
-        # ANIMATING
+        if not self.frozen:
+            if not self.hitstun:
+                # ATTACKS (CONDITIONAL)
+                self.neutralAttack()
+                self.forwardAttack()
+                self.backAttack()
+                self.upAttack()
+                self.downAttack()
+            # HITBOXES (CONDITIONAL)
+            self.activeHitboxesSetter()
+            # GETTING HIT (CONDITIONAL)
+            if not self.invincibility:
+                self.getHit(opponent_hitboxes)
+        # ANIMATING (ALWAYS)
         self.draw()
 
         if self.hitstun or self.momentum:
             print(self.acc.x, self.vel.x)
             # time.sleep(1)
-
-
-
-
-
-
