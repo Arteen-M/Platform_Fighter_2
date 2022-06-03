@@ -69,12 +69,12 @@ class Square(pygame.sprite.Sprite):
 
         self.direction = True  # True = Right
 
-        # def __init__(self, size, display, lag, start_flag, end_flag, angle, damage, base, scale, hitstun, color=RED)
-        self.n_attack = hitbox.HitBox((60, 60), self.display, 20, 15, 5, (0.5, 0.5), 5, 1, 0.25, 5, self.color)
-        self.f_attack = hitbox.HitBox((20, 20), self.display, 20, 15, 5, (0.65, 0.35), 7, 1.5, 0.2, 3, self.color)
-        self.b_attack = hitbox.HitBox((40, 15), self.display, 20, 15, 5, (0.65, 0.35), 8, 0.5, 0.3, 3, self.color)
-        self.u_attack = hitbox.HitBox((40, 30), self.display, 20, 15, 5, (0.85, 0.15), 1, 1, 1, 1, self.color)
-        self.d_attack = hitbox.HitBox((50, 30), self.display, 20, 15, 5, (1, 0), 1, 1, 1, 1, self.color)
+        # size, display, lag, start_flag, end_flag, direction, angle, damage, base, scale, hitstun, color=RED
+        self.n_attack = hitbox.HitBox((60, 60), self.display, 20, 15, 5, 1, (0.5, 0.5), 5, 1, 0.25, 5, self.color)
+        self.f_attack = hitbox.HitBox((20, 20), self.display, 20, 15, 5, 1, (0.65, 0.35), 7, 1.5, 0.2, 3, self.color)
+        self.b_attack = hitbox.HitBox((40, 15), self.display, 20, 15, 5, 1, (-0.65, 0.35), 8, 0.5, 0.3, 3, self.color)
+        self.u_attack = hitbox.HitBox((40, 30), self.display, 20, 15, 5, 1, (0.15, 0.65), 4, 1, 0.25, 5, self.color)
+        self.d_attack = hitbox.HitBox((50, 30), self.display, 20, 15, 5, 1, (0.05, -0.6), 10, 1.5, 0.3, 5, self.color)
 
         self.all_hitboxes = [self.n_attack, self.f_attack, self.b_attack, self.u_attack, self.d_attack]
         self.active_hitboxes = pygame.sprite.Group()
@@ -146,7 +146,7 @@ class Square(pygame.sprite.Sprite):
 
     def directionChange(self):
         pressed_keys = pygame.key.get_pressed()
-        if self.on_ground and self.lag <= 0:
+        if self.on_ground:
             if pressed_keys[self.left]:
                 self.direction = False
             elif pressed_keys[self.right]:
@@ -249,6 +249,10 @@ class Square(pygame.sprite.Sprite):
     def activeHitboxesSetter(self):
         for hitbox in self.all_hitboxes:
             if hitbox.count == hitbox.start_flag:
+                if self.direction:
+                    hitbox.direction = 1
+                else:
+                    hitbox.direction = -1
                 self.active_hitboxes.add(hitbox)
             elif not hitbox.active and self.active_hitboxes.has(hitbox):
                 self.active_hitboxes.remove(hitbox)
@@ -328,8 +332,8 @@ class Square(pygame.sprite.Sprite):
             self.knockback.y = -1 * self.knockbackFormula(box.y_component, box.damage, box.knockback_scale, box.base_knockback, 1)
 
             # self.vel = self.knockback
-            self.acc = self.knockback / 10
-            self.vel = self.knockback
+            self.acc = vec(box.direction * self.knockback.x / 10, self.knockback.y)
+            self.vel = vec(box.direction * self.knockback.x, self.knockback.y)
 
             velocity = math.sqrt((self.knockback.x ** 2) + (self.knockback.y ** 2))
             self.hitstun = math.floor(self.hitstunFormula(velocity, box.hitstun, box.damage))
@@ -347,7 +351,8 @@ class Square(pygame.sprite.Sprite):
         self.wallCollide(walls)
         # STATE CHANGES
         self.stateChange(hard_floors)
-        self.directionChange()
+        if not (self.lag or self.hitstun):
+            self.directionChange()
         # MOVEMENTS
         if not self.hitstun:
             self.move(walls)
