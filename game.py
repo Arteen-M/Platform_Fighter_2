@@ -4,6 +4,7 @@ import sys
 from Characters import square
 from Stage_Elements import floor
 from Stage_Elements import wall
+import pandas as pd
 
 pygame.init()
 

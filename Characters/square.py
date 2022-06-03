@@ -67,16 +67,19 @@ class Square(pygame.sprite.Sprite):
 
         self.direction = True  # True = Right
 
-        self.n_attack = hitbox.HitBox((60, 60), self.display, 20, 15, 5, (math.sin(math.radians(45)), math.sin(math.radians(45))), 1, 1, 1, 1, self.color)
-        self.f_attack = hitbox.HitBox((20, 20), self.display, 20, 15, 5, (math.sin(math.radians(60)), math.sin(math.radians(30))), 1, 1, 1, 1, self.color)
-        self.b_attack = hitbox.HitBox((40, 15), self.display, 20, 15, 5, (math.sin(math.radians(60)), math.sin(math.radians(30))), 1, 1, 1, 1, self.color)
-        self.u_attack = hitbox.HitBox((40, 30), self.display, 20, 15, 5, (math.sin(math.radians(80)), math.sin(math.radians(10))), 1, 1, 1, 1, self.color)
-        self.d_attack = hitbox.HitBox((50, 30), self.display, 20, 15, 5, (math.sin(math.radians(90)), math.sin(math.radians(0))), 1, 1, 1, 1, self.color)
+        self.n_attack = hitbox.HitBox((60, 60), self.display, 20, 15, 5, (0.5, 0.5), 1, 1, 1, 1, self.color)
+        self.f_attack = hitbox.HitBox((20, 20), self.display, 20, 15, 5, (0.65, 0.35), 1, 1, 1, 1, self.color)
+        self.b_attack = hitbox.HitBox((40, 15), self.display, 20, 15, 5, (0.65, 0.35), 1, 1, 1, 1, self.color)
+        self.u_attack = hitbox.HitBox((40, 30), self.display, 20, 15, 5, (0.85, 0.15), 1, 1, 1, 1, self.color)
+        self.d_attack = hitbox.HitBox((50, 30), self.display, 20, 15, 5, (1, 0), 1, 1, 1, 1, self.color)
 
         self.all_hitboxes = [self.n_attack, self.f_attack, self.b_attack, self.u_attack, self.d_attack]
         self.active_hitboxes = pygame.sprite.Group()
 
         self.lag = 0
+        self.hitstun = 0
+        self.momentum = 0
+        self.knockback = vec(0, 0)
 
     def draw(self):
         self.display.blit(self.surf, self.rect)
@@ -85,8 +88,12 @@ class Square(pygame.sprite.Sprite):
         if self.lag > 0:
             self.lag -= 1
 
-    def knockbackFormula(self, angle, damage, scale, base):
-        velocity = angle * (((((self.percentage / 10) + (self.percentage * (damage / 2) / 20) * (
+    def countHitstun(self):
+        if self.hitstun > 0:
+            self.hitstun -= 1
+
+    def knockbackFormula(self, angle, damage, scale, base, mod):
+        velocity = mod * angle * (((((self.percentage / 10) + (self.percentage * (damage / 2) / 20) * (
                 (200 / (self.weight + 100)) * 1.4) + 18) * scale) + base))
         return velocity
 
@@ -97,10 +104,10 @@ class Square(pygame.sprite.Sprite):
     def findHitstop(damage, multiplyer):
         return math.floor(((damage * 0.45) + 2) * multiplyer + 3)
 
-    def setGravity(self, floors):
+    def floorCollide(self, floors):
         floor_collide = pygame.sprite.spritecollide(self, floors, False)
 
-        if floor_collide:
+        if floor_collide and self.vel.y >= 0:
             self.acc.y = 0
             self.vel.y = 0
             self.pos.y = floor_collide[0].rect.top + 1
@@ -181,6 +188,19 @@ class Square(pygame.sprite.Sprite):
             self.acc.x += self.vel.x * GROUND_FRIC
         else:
             self.acc.x += self.vel.x * AIR_FRIC
+
+    def wallCollide(self, walls):
+        wall_collide = pygame.sprite.spritecollide(self, walls, False)
+
+        if self.vel.x < 0 and wall_collide:
+            if wall_collide[0].direction == "LEFT":
+                self.acc.x = 0
+                self.vel.x = 0
+
+        if self.vel.y > 0 and wall_collide:
+            if wall_collide[0].direction == "RIGHT":
+                self.acc.x = 0
+                self.vel.x = 0
 
     def physicsUpdate(self):
         self.vel.y += self.acc.y
@@ -282,25 +302,54 @@ class Square(pygame.sprite.Sprite):
     def getHit(self, opponent_hitboxes):
         hit = pygame.sprite.spritecollide(self, opponent_hitboxes, True)
         if hit:
-            self.percentage += hit[0].damage
+            box = hit[0]
+
+            self.percentage += box.damage
             print(self.percentage)
 
+            self.knockback.x = self.knockbackFormula(box.x_component, box.damage, box.knockback_scale, box.base_knockback, 1)
+            self.knockback.y = -1 * self.knockbackFormula(box.y_component, box.damage, box.knockback_scale, box.base_knockback, 1)
+
+            # self.vel = self.knockback
+            self.acc = self.knockback / 10
+            self.vel = self.knockback
+
+            velocity = math.sqrt((self.knockback.x ** 2) + (self.knockback.y ** 2))
+            self.hitstun = self.hitstunFormula(velocity, box.hitstun, box.damage)
+
     def update(self, hard_floors, walls, opponent_hitboxes):
+        # COUNTING FUNCTIONS
         self.countLag()
-        self.setGravity(hard_floors)
+        self.countHitstun()
+        # COLLISION FUNCTIONS
+        self.floorCollide(hard_floors)
+        self.wallCollide(walls)
+        # STATE CHANGES
         self.stateChange(hard_floors)
         self.directionChange()
-        self.move(walls)
-        self.jump()
+        # MOVEMENTS
+        if not self.hitstun:
+            self.move(walls)
+            self.jump()
+
         self.physicsUpdate()
-        self.neutralAttack()
-        self.forwardAttack()
-        self.backAttack()
-        self.upAttack()
-        self.downAttack()
+
+        if not self.hitstun:
+            # ATTACKS
+            self.neutralAttack()
+            self.forwardAttack()
+            self.backAttack()
+            self.upAttack()
+            self.downAttack()
+        # HITBOXES
         self.activeHitboxesSetter()
+        # GETTING HIT
         self.getHit(opponent_hitboxes)
+        # ANIMATING
         self.draw()
+
+        if self.hitstun:
+            print(self.acc)
 
 
 
