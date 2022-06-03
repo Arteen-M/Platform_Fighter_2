@@ -22,6 +22,7 @@ DARK_GRAY = (125, 125, 150)
 
 GROUND_FRIC = -0.12
 AIR_FRIC = -0.12
+MOMENTUM_FRIC = 0.01
 
 
 class Square(pygame.sprite.Sprite):
@@ -39,10 +40,11 @@ class Square(pygame.sprite.Sprite):
         self.air_acc = 0.45
         self.lag_air_acc = 0.4
         self.current_air_acc = self.air_acc
+        self.momentum_acc = 0.1
         self.jump_acc = -4.8
 
         self.percentage = 0.0
-        self.weight = 80
+        self.weight = 100
 
         self.pos = vec(self.rect.midbottom[0], self.rect.midbottom[1])
         self.vel = vec(0, 0)
@@ -67,9 +69,10 @@ class Square(pygame.sprite.Sprite):
 
         self.direction = True  # True = Right
 
-        self.n_attack = hitbox.HitBox((60, 60), self.display, 20, 15, 5, (0.5, 0.5), 1, 1, 1, 1, self.color)
-        self.f_attack = hitbox.HitBox((20, 20), self.display, 20, 15, 5, (0.65, 0.35), 1, 1, 1, 1, self.color)
-        self.b_attack = hitbox.HitBox((40, 15), self.display, 20, 15, 5, (0.65, 0.35), 1, 1, 1, 1, self.color)
+        # def __init__(self, size, display, lag, start_flag, end_flag, angle, damage, base, scale, hitstun, color=RED)
+        self.n_attack = hitbox.HitBox((60, 60), self.display, 20, 15, 5, (0.5, 0.5), 5, 1, 0.25, 5, self.color)
+        self.f_attack = hitbox.HitBox((20, 20), self.display, 20, 15, 5, (0.65, 0.35), 7, 1.5, 0.2, 3, self.color)
+        self.b_attack = hitbox.HitBox((40, 15), self.display, 20, 15, 5, (0.65, 0.35), 8, 0.5, 0.3, 3, self.color)
         self.u_attack = hitbox.HitBox((40, 30), self.display, 20, 15, 5, (0.85, 0.15), 1, 1, 1, 1, self.color)
         self.d_attack = hitbox.HitBox((50, 30), self.display, 20, 15, 5, (1, 0), 1, 1, 1, 1, self.color)
 
@@ -78,6 +81,7 @@ class Square(pygame.sprite.Sprite):
 
         self.lag = 0
         self.hitstun = 0
+        self.max_hitstun = 0
         self.momentum = 0
         self.knockback = vec(0, 0)
 
@@ -92,13 +96,17 @@ class Square(pygame.sprite.Sprite):
         if self.hitstun > 0:
             self.hitstun -= 1
 
+    def countMomentum(self):
+        if self.momentum > 0:
+            self.momentum -= 1
+
     def knockbackFormula(self, angle, damage, scale, base, mod):
         velocity = mod * angle * (((((self.percentage / 10) + (self.percentage * (damage / 2) / 20) * (
                 (200 / (self.weight + 100)) * 1.4) + 18) * scale) + base))
         return velocity
 
     def hitstunFormula(self, velocity, hitstun, damage):
-        return round(velocity / (2 * self.gravity) - (2 * velocity) + (0.1 * self.percentage)) + hitstun + self.findHitstop(damage, 1)
+        return math.floor(velocity / (2 * self.gravity) - (2 * velocity) + (0.1 * self.percentage)) + hitstun + self.findHitstop(damage, 1)
 
     @staticmethod
     def findHitstop(damage, multiplyer):
@@ -120,6 +128,7 @@ class Square(pygame.sprite.Sprite):
         if floor_collide:
             if not self.on_ground:
                 self.lag = 0
+                self.momentum = 0
                 for hitBox in self.all_hitboxes:
                     if hitBox.active:
                         hitBox.reset()
@@ -128,6 +137,7 @@ class Square(pygame.sprite.Sprite):
         else:
             if self.on_ground:
                 self.lag = 0
+                # self.momentum = 0
                 for hitBox in self.all_hitboxes:
                     if hitBox.active:
                         hitBox.reset()
@@ -144,9 +154,14 @@ class Square(pygame.sprite.Sprite):
 
     def move(self, walls):
         self.acc.x = 0
+
         if self.lag <= 0:
-            self.current_ground_acc = self.ground_acc
-            self.current_air_acc = self.air_acc
+            if not self.momentum:
+                self.current_ground_acc = self.ground_acc
+                self.current_air_acc = self.air_acc
+            else:
+                self.current_ground_acc = self.momentum_acc
+                self.current_air_acc = self.momentum_acc
         else:
             self.current_ground_acc = self.lag_ground_acc
             self.current_air_acc = self.lag_air_acc
@@ -184,10 +199,13 @@ class Square(pygame.sprite.Sprite):
                 self.acc.x = 0
                 self.vel.x = 0
 
-        if self.on_ground:
-            self.acc.x += self.vel.x * GROUND_FRIC
+        if not self.momentum:
+            if self.on_ground:
+                self.acc.x += self.vel.x * GROUND_FRIC
+            else:
+                self.acc.x += self.vel.x * AIR_FRIC
         else:
-            self.acc.x += self.vel.x * AIR_FRIC
+            self.vel.x *= 0.98
 
     def wallCollide(self, walls):
         wall_collide = pygame.sprite.spritecollide(self, walls, False)
@@ -305,7 +323,6 @@ class Square(pygame.sprite.Sprite):
             box = hit[0]
 
             self.percentage += box.damage
-            print(self.percentage)
 
             self.knockback.x = self.knockbackFormula(box.x_component, box.damage, box.knockback_scale, box.base_knockback, 1)
             self.knockback.y = -1 * self.knockbackFormula(box.y_component, box.damage, box.knockback_scale, box.base_knockback, 1)
@@ -315,12 +332,16 @@ class Square(pygame.sprite.Sprite):
             self.vel = self.knockback
 
             velocity = math.sqrt((self.knockback.x ** 2) + (self.knockback.y ** 2))
-            self.hitstun = self.hitstunFormula(velocity, box.hitstun, box.damage)
+            self.hitstun = math.floor(self.hitstunFormula(velocity, box.hitstun, box.damage))
+            self.max_hitstun = self.hitstun
+            self.momentum = math.floor(self.hitstun * math.ceil(box.hitstun) + 1)
+            print(self.hitstun, self.momentum)
 
     def update(self, hard_floors, walls, opponent_hitboxes):
         # COUNTING FUNCTIONS
         self.countLag()
         self.countHitstun()
+        self.countMomentum()
         # COLLISION FUNCTIONS
         self.floorCollide(hard_floors)
         self.wallCollide(walls)
@@ -348,8 +369,9 @@ class Square(pygame.sprite.Sprite):
         # ANIMATING
         self.draw()
 
-        if self.hitstun:
-            print(self.acc)
+        if self.hitstun or self.momentum:
+            print(self.acc.x, self.vel.x)
+            # time.sleep(1)
 
 
 

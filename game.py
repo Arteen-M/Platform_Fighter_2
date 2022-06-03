@@ -4,9 +4,12 @@ import sys
 from Characters import square
 from Stage_Elements import floor
 from Stage_Elements import wall
+from Characters.Character_Elements import graphic
 import pandas as pd
 
 pygame.init()
+pygame.font.init()
+
 
 WIDTH = 800
 HEIGHT = 600
@@ -31,8 +34,12 @@ FramePerSec = pygame.time.Clock()
 display = pygame.display.set_mode((WIDTH,  HEIGHT))
 pygame.display.set_caption("Platform Fighter")
 
+font = "impact"
+
 P1 = square.Square(display, color=RED, spawn_position=((WIDTH/2) - 100, HEIGHT/2))
+P1_Graphic = graphic.Graphic(display, font, 36, (250, 550), RED)
 P2 = square.Square(display, color=BLUE, spawn_position=((WIDTH/2) + 100, HEIGHT/2), controls=(K_a, K_d, K_w, K_s, K_t))
+P2_Graphic = graphic.Graphic(display, font, 36, (550, 550), BLUE)
 
 mainFloor = floor.Floor(display, dimensions=(WIDTH/2, 10), pos=(WIDTH/2, 400))
 
@@ -62,6 +69,9 @@ while True:
 
     P1.update(hard_floors, walls, P2.active_hitboxes)
     P2.update(hard_floors, walls, P1.active_hitboxes)
+
+    P1_Graphic.update(P1.percentage)
+    P2_Graphic.update(P2.percentage)
 
     for element in hard_floors:
         element.draw()
