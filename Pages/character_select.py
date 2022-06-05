@@ -4,6 +4,7 @@ import sys
 import time
 from GUI_Elements import char_select
 from GUI_Elements import player_select
+import pandas as pd
 
 pygame.init()
 pygame.font.init()
@@ -27,6 +28,10 @@ display = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Platform Fighter")
 
 font = 'impact'
+
+data = pd.read_csv("../Names/Names.csv").to_dict()
+data.pop("Unnamed: 0")
+data.pop('Controls')
 
 
 def text_objects(text, font, colour):
