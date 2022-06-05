@@ -35,30 +35,49 @@ inputList = [K_TAB, K_CLEAR, K_RETURN, K_PAUSE, K_SPACE, K_QUOTE, K_MINUS,
              K_KP_ENTER, K_KP_EQUALS, K_UP, K_DOWN, K_RIGHT, K_LEFT, K_RALT, K_LALT]
 
 
-def text_objects(text, font, colour):
+def text_objects(text, font, colour, center):
     textSurface = font.render(text, True, colour)
-    return textSurface, textSurface.get_rect()
+    textRect = textSurface.get_rect(center=center)
+    return textSurface, textRect
 
 
 panel = control_select.controlPanel(display)
 names = name_dropdown.nameDrop((WIDTH/2 - 100, 150), display)
 
 
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
+def button(x, y, w, h, display):
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+    text = text_objects("Back", pygame.font.SysFont(font, 36), WHITE, (x + w/2, y + h/2))
 
-    display.fill(BLACK)
+    if x + w > mouse[0] > x and y + h > mouse[1] > y:
+        if click[0] == 1:
+            return True
 
-    if not names.pressed:
-        panel.update()
-    if names.update() is not None:
-        panel.reInit(names.controls)
+    display.blit(text[0], text[1])
+    pygame.draw.rect(display, RED, (x, y, w, h), 1)
 
-    names.saveControls(panel.returnControls())
 
-    pygame.display.update()
-    FramePerSec.tick(FPS)
+def controlChange():
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
 
+        display.fill(BLACK)
+        if button(50, 50, 150, 50, display):
+            return "Character Select"
+
+        if not names.pressed:
+            panel.update()
+        if names.update() is not None:
+            panel.reInit(names.controls)
+
+        names.saveControls(panel.returnControls())
+
+        pygame.display.update()
+        FramePerSec.tick(FPS)
+
+
+# controlChange()
