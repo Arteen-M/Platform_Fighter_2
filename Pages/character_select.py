@@ -6,7 +6,7 @@ from GUI_Elements import char_select
 from GUI_Elements import player_select
 
 pygame.init()
-pygame.mixer.init()
+pygame.font.init()
 
 WIDTH = 800
 HEIGHT = 600

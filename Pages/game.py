@@ -6,6 +6,7 @@ from Stage_Elements import floor
 from Stage_Elements import wall
 from Characters.Character_Elements import graphic
 from Stage_Elements import timer
+from Pages import pause
 import time
 import pandas as pd
 
@@ -76,6 +77,8 @@ def gameLoop(characters, skins, times=1, stocks=3):
                 if event.key == P2.up:
                     if not P2.frozen:
                         P2.tapped_up = True
+                if event.key == K_ESCAPE:
+                    pause.Pause()
 
         display.fill(BLACK)
 
