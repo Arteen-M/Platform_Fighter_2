@@ -39,7 +39,7 @@ pygame.display.set_caption("Platform Fighter")
 font = "impact"
 
 
-def gameLoop(times=1, stocks=3):
+def gameLoop(characters, times=1, stocks=3):
     num_time = times
     stocks = stocks
 
