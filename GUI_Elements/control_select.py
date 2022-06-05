@@ -94,11 +94,13 @@ class controlButton:
 class controlPanel:
     def __init__(self, display, controls=(K_LEFT, K_RIGHT, K_UP, K_DOWN, K_h), pos=(WIDTH/2, HEIGHT/2)):
         self.controls = controls
-        self.left = controlButton("<", self.controls[0], (pos[0] - 60, pos[1] + 50), display)
-        self.right = controlButton(">", self.controls[1], (pos[0] + 60, pos[1] + 50), display)
-        self.up = controlButton("^", self.controls[2], (pos[0], pos[1] - 50), display)
-        self.down = controlButton("v", self.controls[3], (pos[0], pos[1] + 50), display)
-        self.attack = controlButton("Atk", self.controls[4], (pos[0] + 60, pos[1] - 50), display, bigSize=30)
+        self.pos = pos
+        self.display = display
+        self.left = controlButton("<", self.controls[0], (self.pos[0] - 60, self.pos[1] + 50), self.display)
+        self.right = controlButton(">", self.controls[1], (self.pos[0] + 60, self.pos[1] + 50), self.display)
+        self.up = controlButton("^", self.controls[2], (self.pos[0], self.pos[1] - 50), self.display)
+        self.down = controlButton("v", self.controls[3], (self.pos[0], self.pos[1] + 50), self.display)
+        self.attack = controlButton("Atk", self.controls[4], (self.pos[0] + 60, self.pos[1] - 50), self.display, bigSize=30)
 
     def update(self):
         self.left.update()
@@ -106,3 +108,14 @@ class controlPanel:
         self.down.update()
         self.up.update()
         self.attack.update()
+
+    def reInit(self, controls):
+        self.controls = controls
+        self.left = controlButton("<", self.controls[0], (self.pos[0] - 60, self.pos[1] + 50), self.display)
+        self.right = controlButton(">", self.controls[1], (self.pos[0] + 60, self.pos[1] + 50), self.display)
+        self.up = controlButton("^", self.controls[2], (self.pos[0], self.pos[1] - 50), self.display)
+        self.down = controlButton("v", self.controls[3], (self.pos[0], self.pos[1] + 50), self.display)
+        self.attack = controlButton("Atk", self.controls[4], (self.pos[0] + 60, self.pos[1] - 50), self.display, bigSize=30)
+
+    def returnControls(self):
+        return [self.left.control, self.right.control, self.up.control, self.down.control, self.attack.control]

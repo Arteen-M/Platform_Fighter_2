@@ -1,10 +1,8 @@
 import pygame
 from pygame.locals import *
 import sys
-import pandas as pd
 from GUI_Elements import control_select
-
-data = pd.read_csv("../Names/Names.csv").to_dict()
+from GUI_Elements import name_dropdown
 
 pygame.init()
 pygame.font.init()
@@ -43,6 +41,7 @@ def text_objects(text, font, colour):
 
 
 panel = control_select.controlPanel(display)
+names = name_dropdown.nameDrop((WIDTH/2 - 100, 150), display)
 
 
 while True:
@@ -52,7 +51,13 @@ while True:
             sys.exit()
 
     display.fill(BLACK)
-    panel.update()
+
+    if not names.pressed:
+        panel.update()
+    if names.update() is not None:
+        panel.reInit(names.controls)
+
+    names.saveControls(panel.returnControls())
 
     pygame.display.update()
     FramePerSec.tick(FPS)

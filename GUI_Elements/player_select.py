@@ -32,7 +32,7 @@ def button(x, y, w, h, shape, display):
             return True
 
     pygame.draw.polygon(display, GRAY, shape)
-    pygame.draw.rect(display, RED, (x, y, w, h), 1)
+    # pygame.draw.rect(display, RED, (x, y, w, h), 1)
 
 
 class playerSelect(pygame.sprite.Sprite):
