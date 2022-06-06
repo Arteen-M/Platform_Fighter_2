@@ -80,4 +80,4 @@ def controlChange():
         FramePerSec.tick(FPS)
 
 
-# controlChange()
+controlChange()

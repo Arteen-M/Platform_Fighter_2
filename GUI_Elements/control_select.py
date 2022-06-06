@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+from GUI_Elements import button
 
 
 font = 'impact'
@@ -33,15 +34,6 @@ def text_objects(text, font, colour):
     return textSurface, textSurface.get_rect()
 
 
-def button(x, y, w, h):
-    mouse = pygame.mouse.get_pos()
-    click = pygame.mouse.get_pressed()
-
-    if x + w > mouse[0] > x and y + h > mouse[1] > y:
-        if click[0] == 1:
-            return True
-
-
 class controlButton:
     def __init__(self, name, control, pos, display, bigSize=32, smallSize=20):
         self.name = name
@@ -61,20 +53,20 @@ class controlButton:
         self.border = DARKER_RED
 
         self.display = display
+        self.button = button.Button(self.pos[0] - 25, self.pos[1] - 25, 50, 50, None, None, None, self.display)
         self.pressed = False
 
     def update(self):
         pressed_keys = pygame.key.get_pressed()
-
-        if button(self.pos[0] - 25, self.pos[1] - 25, 50, 50):
-            self.pressed = True
+        self.button.update()
 
         pygame.draw.rect(self.display, self.color, (self.pos[0] - 25, self.pos[1] - 25, 50, 50))
         pygame.draw.rect(self.display, self.border, (self.pos[0] - 25, self.pos[1] - 25, 50, 50), 5)
         self.display.blit(self.nameSurf, self.nameRect)
         self.display.blit(self.controlSurf, self.controlRect)
 
-        if self.pressed:
+        if self.button.pressed or self.pressed:
+            self.pressed = True
             for key in input_list:
                 if pressed_keys[key]:
                     self.control = key
@@ -83,7 +75,7 @@ class controlButton:
                     self.controlRect.center = (self.pos[0], self.pos[1] + 40)
                     self.pressed = False
 
-        if self.pressed:
+        if self.button.pressed or self.pressed:
             self.color = BLUE
             self.border = DARK_BLUE
         else:
