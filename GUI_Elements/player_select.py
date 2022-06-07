@@ -84,12 +84,15 @@ class playerSelect(pygame.sprite.Sprite):
                     self.skin_position = len(self.skins) - 1
                 else:
                     self.skin_position -= 1
+                self.backButton.pressed = False
 
             if self.forwardButton.pressed:
                 if self.skin_position == len(self.skins) - 1:
                     self.skin_position = 0
                 else:
                     self.skin_position += 1
+
+                self.forwardButton.pressed = False
 
         if character == "Square":
             self.characterSurf = pygame.Surface((100, 100))
@@ -101,6 +104,7 @@ class playerSelect(pygame.sprite.Sprite):
         self.display.blit(self.nameSurf, self.nameRect)
 
     def get_pressed(self, click):
+        # print(click)
         self.backButton.get_pressed(click)
         self.forwardButton.get_pressed(click)
 

@@ -92,8 +92,6 @@ def characterSelect():
             else:
                 p1_select.get_pressed(False)
                 p2_select.get_pressed(False)
-                square_select.get_pressed(False)
-                controls.get_pressed(False)
 
         display.fill(BLACK)
         display.blit(textSurf, textRect)
@@ -143,4 +141,4 @@ def characterSelect():
         FramePerSec.tick(FPS)
 
 
-characterSelect()
+# characterSelect()

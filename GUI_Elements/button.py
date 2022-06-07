@@ -51,5 +51,7 @@ class Button:
                 self.pressed = True
             else:
                 self.pressed = False
+        else:
+            self.pressed = False
 
 

@@ -76,7 +76,7 @@ class Square(pygame.sprite.Sprite):
         # size, display, lag, start_flag, end_flag, direction, angle, damage, base, scale, hitstun, color=RED
         self.n_attack = hitbox.HitBox((60, 60), self.display, 20, 15, 5, 1, (0.5, 0.5), 5, 1, 0.2, 5, self.color)
         self.f_attack = hitbox.HitBox((20, 20), self.display, 20, 15, 5, 1, (0.6, 0.4), 7, 1.5, 0.2, 3, self.color)
-        self.b_attack = hitbox.HitBox((40, 15), self.display, 20, 15, 5, 1, (-0.65, 0.35), 8, 0.5, 0.3, 3, self.color)
+        self.b_attack = hitbox.HitBox((40, 15), self.display, 20, 15, 5, 1, (-0.65, 0.35), 8, 1, 0.2, 3, self.color)
         self.u_attack = hitbox.HitBox((40, 30), self.display, 20, 15, 5, 1, (0.15, 0.7), 4, 1.2, 0.3, 5, self.color)
         self.d_attack = hitbox.HitBox((50, 30), self.display, 20, 15, 5, 1, (0.05, -0.6), 10, 1.5, 0.3, 5, self.color)
 
