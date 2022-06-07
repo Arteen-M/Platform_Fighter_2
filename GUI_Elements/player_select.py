@@ -1,5 +1,6 @@
 import pygame
 import time
+from GUI_Elements import button
 
 
 font = 'impact'
@@ -21,7 +22,7 @@ def text_objects(text, font, colour):
     textSurface = font.render(text, True, colour)
     return textSurface, textSurface.get_rect()
 
-
+"""
 def button(x, y, w, h, shape, display):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
@@ -33,6 +34,7 @@ def button(x, y, w, h, shape, display):
 
     pygame.draw.polygon(display, GRAY, shape)
     # pygame.draw.rect(display, RED, (x, y, w, h), 1)
+"""
 
 
 class playerSelect(pygame.sprite.Sprite):
@@ -60,8 +62,8 @@ class playerSelect(pygame.sprite.Sprite):
         self.skin = None
         self.skin_position = 0
 
-        self.backButton = button(self.pos[0] - 170, self.pos[1] + 58, 30, 35, ((self.pos[0] - 150, self.pos[1] + 60), (self.pos[0] - 150, self.pos[1] + 90), (self.pos[0] - 165, self.pos[1] + 75)), display)
-        self.forwardButton = button(self.pos[0] - 70, self.pos[1] + 58, 30, 35, ((self.pos[0] - 50, self.pos[1] + 60), (self.pos[0] - 50, self.pos[1] + 90), (self.pos[0] - 35, self.pos[1] + 75)), display)
+        self.backButton = button.Button(self.pos[0] - 170, self.pos[1] + 58, 30, 35, ((self.pos[0] - 150, self.pos[1] + 60), (self.pos[0] - 150, self.pos[1] + 90), (self.pos[0] - 165, self.pos[1] + 75)), GRAY, None, display, draw=True)
+        self.forwardButton = button.Button(self.pos[0] - 70, self.pos[1] + 58, 30, 35, ((self.pos[0] - 50, self.pos[1] + 60), (self.pos[0] - 50, self.pos[1] + 90), (self.pos[0] - 35, self.pos[1] + 75)), GRAY, None, display, draw=True)
         # self.characterSurf = pygame.Surface((100, 100))
         # self.characterSurf.fill(self.color)
         # self.characterRect = self.characterSurf.get_rect(center=self.pos)
@@ -70,17 +72,20 @@ class playerSelect(pygame.sprite.Sprite):
 
     def update(self, character, skins):
         pygame.draw.rect(self.display, self.color, self.rect, 1)
+        self.forwardButton.update()
+        self.backButton.update()
+
         if skins is not None:
             self.skins = skins
             self.skin = self.skins[self.skin_position]
 
-            if self.backButton:
+            if self.backButton.pressed:
                 if self.skin_position == 0:
                     self.skin_position = len(self.skins) - 1
                 else:
                     self.skin_position -= 1
 
-            if self.forwardButton:
+            if self.forwardButton.pressed:
                 if self.skin_position == len(self.skins) - 1:
                     self.skin_position = 0
                 else:
@@ -95,13 +100,9 @@ class playerSelect(pygame.sprite.Sprite):
         self.display.blit(self.playerSurf, self.playerRect)
         self.display.blit(self.nameSurf, self.nameRect)
 
-        self.backButton = button(self.pos[0] - 170, self.pos[1] + 58, 30, 35, (
-        (self.pos[0] - 150, self.pos[1] + 60), (self.pos[0] - 150, self.pos[1] + 90),
-        (self.pos[0] - 165, self.pos[1] + 75)), self.display)
-
-        self.forwardButton = button(self.pos[0] - 60, self.pos[1] + 58, 30, 35, (
-        (self.pos[0] - 50, self.pos[1] + 60), (self.pos[0] - 50, self.pos[1] + 90),
-        (self.pos[0] - 35, self.pos[1] + 75)), self.display)
+    def get_pressed(self, click):
+        self.backButton.get_pressed(click)
+        self.forwardButton.get_pressed(click)
 
 
 

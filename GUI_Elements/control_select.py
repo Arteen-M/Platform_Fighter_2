@@ -82,6 +82,9 @@ class controlButton:
             self.color = DARK_RED
             self.border = DARKER_RED
 
+    def get_pressed(self, click):
+        self.button.get_pressed(click)
+
 
 class controlPanel:
     def __init__(self, display, controls=(K_LEFT, K_RIGHT, K_UP, K_DOWN, K_h), pos=(WIDTH/2, HEIGHT/2)):
@@ -100,6 +103,13 @@ class controlPanel:
         self.down.update()
         self.up.update()
         self.attack.update()
+
+    def get_pressed(self, click):
+        self.left.get_pressed(click)
+        self.right.get_pressed(click)
+        self.down.get_pressed(click)
+        self.up.get_pressed(click)
+        self.attack.get_pressed(click)
 
     def reInit(self, controls):
         self.controls = controls

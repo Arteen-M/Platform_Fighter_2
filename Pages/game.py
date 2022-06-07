@@ -32,17 +32,17 @@ pygame.display.set_caption("Platform Fighter")
 font = "impact"
 
 
-def gameLoop(characters, skins, times=1, stocks=3):
+def gameLoop(characters, controls, skins, times=1, stocks=3):
     num_time = times
     stocks = stocks
 
     timerObj = timer.Timer(num_time, font, 36, WHITE, (WIDTH - 100, 100), display)
 
     if characters[0] == "Square":
-        P1 = square.Square(display, color=skins[0], spawn_position=((WIDTH/2) - 100, HEIGHT/2), stocks=stocks)
+        P1 = square.Square(display, color=skins[0], spawn_position=((WIDTH/2) - 100, HEIGHT/2), controls=list(controls["Player 1"].values()), stocks=stocks)
         P1_Graphic = graphic.Graphic(display, font, 36, (300, 500), skins[0], stocks=stocks)
     if characters[1] == "Square":
-        P2 = square.Square(display, color=skins[1], spawn_position=((WIDTH/2) + 100, HEIGHT/2), controls=(K_a, K_d, K_w, K_s, K_t), stocks=stocks)
+        P2 = square.Square(display, color=skins[1], spawn_position=((WIDTH/2) + 100, HEIGHT/2), controls=list(controls["Player 2"].values()), stocks=stocks)
         P2_Graphic = graphic.Graphic(display, font, 36, (500, 500), skins[1], side=False, stocks=stocks)
 
     mainFloor = floor.Floor(display, dimensions=(WIDTH/2, 10), pos=(WIDTH/2, 400))

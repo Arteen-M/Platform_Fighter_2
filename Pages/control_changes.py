@@ -1,8 +1,11 @@
 import pygame
 from pygame.locals import *
 import sys
+import time
+import pandas as pd
 from GUI_Elements import control_select
 from GUI_Elements import name_dropdown
+from GUI_Elements import button
 
 pygame.init()
 pygame.font.init()
@@ -41,33 +44,33 @@ def text_objects(text, font, colour, center):
     return textSurface, textRect
 
 
-panel = control_select.controlPanel(display)
-names = name_dropdown.nameDrop((WIDTH/2 - 100, 150), display)
-
-
-def button(x, y, w, h, display):
-    mouse = pygame.mouse.get_pos()
-    click = pygame.mouse.get_pressed()
-    text = text_objects("Back", pygame.font.SysFont(font, 36), WHITE, (x + w/2, y + h/2))
-
-    if x + w > mouse[0] > x and y + h > mouse[1] > y:
-        if click[0] == 1:
-            return True
-
-    display.blit(text[0], text[1])
-    pygame.draw.rect(display, RED, (x, y, w, h), 1)
-
-
 def controlChange():
+    names = name_dropdown.nameDrop((WIDTH / 2 - 100, 150), display)
+    panel = control_select.controlPanel(display, controls=names.controls)
+    back_button = button.Button(50, 50, 150, 50, None, None, None, display)
+    textSurf, textRect = text_objects("Back", pygame.font.SysFont('impact', 36), WHITE, (100, 75))
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                panel.get_pressed(True)
+                back_button.get_pressed(True)
+                names.get_pressed(True)
+            else:
+                panel.get_pressed(False)
+                back_button.get_pressed(False)
+                names.get_pressed(False)
 
         display.fill(BLACK)
-        if button(50, 50, 150, 50, display):
-            return "Character Select"
+
+        display.blit(textSurf, textRect)
+
+        back_button.update()
+        if back_button.pressed:
+            return names.names
 
         if not names.pressed:
             panel.update()
@@ -80,4 +83,4 @@ def controlChange():
         FramePerSec.tick(FPS)
 
 
-controlChange()
+# controlChange()

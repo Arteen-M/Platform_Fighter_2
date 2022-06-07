@@ -52,7 +52,5 @@ class charButton(pygame.sprite.Sprite):
         self.display.blit(self.textSurf, self.textRect)
         self.display.blit(self.image, self.image_rect)
 
-        if self.button.pressed:
-            return True
-        else:
-            return False
+    def get_pressed(self, click):
+        self.button.get_pressed(click)

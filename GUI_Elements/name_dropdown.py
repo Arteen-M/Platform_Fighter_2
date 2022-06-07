@@ -29,12 +29,13 @@ class nameDrop:
         self.names = pd.read_csv("../Names/Names.csv").to_dict()
         if 'Unnamed: 0' in list(self.names.keys()):
             self.names.pop('Unnamed: 0')
+
         self.name = 'Player 1'
         self.controls = self.names[self.name]
 
         self.all_texts = []
         self.key_lists = list(self.names.keys())
-        self.key_lists.append("New Name")
+        # self.key_lists.append("New Name")
         self.value_lists = list(self.names.values())
         for count, name in enumerate(self.key_lists):
             self.all_texts.append(text_objects(name, self.font, WHITE, (pos[0] + 100, pos[1] + 25 + (50 * (count + 1)))))
@@ -75,8 +76,12 @@ class nameDrop:
 
         return None
 
+    def get_pressed(self, click):
+        self.button.get_pressed(click)
+        for x in self.buttons_list:
+            x.get_pressed(click)
+
     def saveControls(self, controls):
-        temp = {0: controls[0], 1: controls[1], 2: controls[2], 3: controls[3], 4: controls[4]}
-        self.names[self.name] = temp
+        self.names[self.name] = {0: controls[0], 1: controls[1], 2: controls[2], 3: controls[3], 4: controls[4]}
         df = pd.DataFrame(self.names)
         df.to_csv("../Names/Names.csv")

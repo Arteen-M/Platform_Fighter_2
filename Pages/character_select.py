@@ -2,8 +2,11 @@ import pygame
 from pygame.locals import *
 import sys
 import time
+import pandas as pd
 from GUI_Elements import char_select
 from GUI_Elements import player_select
+from GUI_Elements import button
+from Pages import control_changes
 
 pygame.init()
 pygame.font.init()
@@ -45,19 +48,31 @@ def characterSelect():
     square_skins_2 = [RED, BLUE, GREEN, YELLOW]
 
     square_select = char_select.charButton((400, 200), "Square", display, RED)
+    controls = button.Button(50, 50, 50, 50, None, None, RED, display, image="../Images/Controls.png")
+
+    try:
+        player_controls = pd.read_csv("../Names/Names.csv").to_dict()
+        if 'Unnamed: 0' in list(player_controls.keys()):
+            player_controls.pop('Unnamed: 0')
+    except pd.errors.EmptyDataError:
+        player_controls = {"Player 1": {0: K_LEFT, 1: K_RIGHT, 2: K_UP, 3: K_DOWN, 4: K_h},
+                           "Player 2": {0: K_a, 1: K_d, 2: K_w, 3: K_s, 4: K_t}}
+
+        df = pd.DataFrame(player_controls)
+        df.to_csv("../Names/Names.csv")
 
     p1_select = player_select.playerSelect(1, (200, 450), RED, display)
     p2_select = player_select.playerSelect(2, (600, 450), BLUE, display)
 
     surf, rect = text_objects("Press Enter to Proceed", pygame.font.SysFont(font, 20), WHITE)
-    rect.center = (WIDTH/2, HEIGHT - 20)
+    rect.center = (WIDTH / 2, HEIGHT - 20)
 
     while True:
         if P1_choosing:
             textSurf, textRect = text_objects("Player 1, Choose your Character:", pygame.font.SysFont(font, 30), RED)
         else:
             textSurf, textRect = text_objects("Player 2, Choose your Character:", pygame.font.SysFont(font, 30), BLUE)
-        textRect.center = (WIDTH/2, 55)
+        textRect.center = (WIDTH / 2, 55)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -67,12 +82,31 @@ def characterSelect():
                 if event.key == K_F11:
                     pygame.display.toggle_fullscreen()
                 if event.key == K_RETURN:
-                    if characters[0] is not None and characters[1] is not None:
-                        return "Game", characters, current_skins
+                    if characters[0] != "" and characters[1] != "":
+                        return "Game", characters, current_skins, player_controls
+            if event.type == MOUSEBUTTONDOWN:
+                p1_select.get_pressed(True)
+                p2_select.get_pressed(True)
+                square_select.get_pressed(True)
+                controls.get_pressed(True)
+            else:
+                p1_select.get_pressed(False)
+                p2_select.get_pressed(False)
+                square_select.get_pressed(False)
+                controls.get_pressed(False)
 
         display.fill(BLACK)
         display.blit(textSurf, textRect)
-        display.blit(surf, rect)
+
+        controls.update()
+        square_select.update()
+
+        if characters[0] != "" and characters[1] != "":
+            display.blit(surf, rect)
+
+        if controls.pressed:
+            player_controls = control_changes.controlChange()
+            controls.pressed = False
 
         current_skins = [p1_select.skin, p2_select.skin]
 
@@ -84,17 +118,17 @@ def characterSelect():
         if current_skins[0] in square_skins_2:
             square_skins_2.remove(current_skins[0])
 
-        if square_select.update():
+        if square_select.button.pressed:
             if P1_choosing:
                 characters[0] = "Square"
                 skins[0] = square_skins_1
                 P1_choosing = False
-                time.sleep(0.25)
             else:
                 characters[1] = "Square"
                 skins[1] = square_skins_2
                 P1_choosing = True
-                time.sleep(0.25)
+
+            square_select.button.pressed = False
 
         if P1_choosing and characters[0] == "Square":
             skins[0] = square_skins_1
@@ -109,4 +143,4 @@ def characterSelect():
         FramePerSec.tick(FPS)
 
 
-# characterSelect()
+characterSelect()
