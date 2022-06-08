@@ -1,9 +1,7 @@
 import pygame
-import time
-from GUI_Elements import button
-
-
-font = 'impact'
+from Version_1.GUI_Elements import button
+from Version_1.GUI_Elements import text
+from Version_1.GUI_Elements.text import font
 
 WIDTH = 800
 HEIGHT = 600
@@ -18,36 +16,15 @@ GRAY = (125, 125, 125)
 DARK_GRAY = (125, 125, 150)
 
 
-def text_objects(text, font, colour):
-    textSurface = font.render(text, True, colour)
-    return textSurface, textSurface.get_rect()
-
-"""
-def button(x, y, w, h, shape, display):
-    mouse = pygame.mouse.get_pos()
-    click = pygame.mouse.get_pressed()
-
-    if x + w > mouse[0] > x and y + h > mouse[1] > y:
-        if click[0] == 1:
-            time.sleep(0.25)
-            return True
-
-    pygame.draw.polygon(display, GRAY, shape)
-    # pygame.draw.rect(display, RED, (x, y, w, h), 1)
-"""
-
-
 class playerSelect(pygame.sprite.Sprite):
     def __init__(self, player, pos, color, display):
         super().__init__()
-        self.font = pygame.font.SysFont(font, 30)
+        self.font = font
         self.num_player = player
-        self.playerSurf, self.playerRect = text_objects("P%d" % self.num_player, self.font, WHITE)
-        self.playerRect.center = (pos[0] + 100, pos[1] + 50)
+        self.playerText = text.Text("P%d" % self.num_player, self.font, 30, WHITE, (pos[0] + 100, pos[1] + 50), display)
 
         self.name = "Player %d" % self.num_player
-        self.nameSurf, self.nameRect = text_objects(self.name, self.font, WHITE)
-        self.nameRect.center = (pos[0] + 100, pos[1] - 50)
+        self.nameText = text.Text(self.name, self.font, 30, WHITE, (pos[0] + 100, pos[1] - 50), display)
 
         self.surf = pygame.Surface((350, 200))
         self.pos = pos
@@ -100,8 +77,8 @@ class playerSelect(pygame.sprite.Sprite):
             self.characterRect = self.characterSurf.get_rect(center=(self.pos[0] - 100, self.pos[1]))
             self.display.blit(self.characterSurf, self.characterRect)
 
-        self.display.blit(self.playerSurf, self.playerRect)
-        self.display.blit(self.nameSurf, self.nameRect)
+        self.playerText.draw()
+        self.nameText.draw()
 
     def get_pressed(self, click):
         # print(click)

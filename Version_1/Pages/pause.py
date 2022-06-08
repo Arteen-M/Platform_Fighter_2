@@ -1,6 +1,11 @@
+# -------------------------------------------------------------------------
+# IMPORTS
+# -------------------------------------------------------------------------
 import pygame
 from pygame.locals import *
 import sys
+from Version_1.GUI_Elements import text
+from Version_1.GUI_Elements.text import font
 
 pygame.init()
 pygame.font.init()
@@ -23,20 +28,10 @@ FramePerSec = pygame.time.Clock()
 display = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Platform Fighter")
 
-font = 'impact'
-
-
-def text_objects(text, font, colour):
-    textSurface = font.render(text, True, colour)
-    return textSurface, textSurface.get_rect()
-
 
 def Pause():
-    pauseSurf, pauseRect = text_objects("Pause", pygame.font.SysFont(font, 64), WHITE)
-    pauseRect.center = (WIDTH/2, HEIGHT/2 - 50)
-
-    instructSurf, instructRect = text_objects("Press Enter or Escape to Resume", pygame.font.SysFont(font, 32), WHITE)
-    instructRect.center = (WIDTH/2, HEIGHT/2 + 50)
+    pauseText = text.Text("Pause", font, 64, WHITE, (WIDTH/2, HEIGHT/2 - 50), display)
+    instructText = text.Text("Press Enter or Escape to Resume", font, 32, WHITE, (WIDTH/2, HEIGHT/2 + 50), display)
 
     while True:
         for event in pygame.event.get():
@@ -48,8 +43,8 @@ def Pause():
                     return
 
         display.fill(BLACK)
-        display.blit(pauseSurf, pauseRect)
-        display.blit(instructSurf, instructRect)
+        pauseText.draw()
+        instructText.draw()
 
         pygame.display.update()
         FramePerSec.tick(FPS)

@@ -1,7 +1,7 @@
 import pygame
-from GUI_Elements import button
-
-font = 'impact'
+from Version_1.GUI_Elements import button
+from Version_1.GUI_Elements import text
+from Version_1.GUI_Elements.text import font
 
 WIDTH = 800
 HEIGHT = 600
@@ -16,11 +16,6 @@ GRAY = (125, 125, 125)
 DARK_GRAY = (125, 125, 150)
 
 
-def text_objects(text, font, colour):
-    textSurface = font.render(text, True, colour)
-    return textSurface, textSurface.get_rect()
-
-
 class charButton(pygame.sprite.Sprite):
     def __init__(self, pos, name, display, color, image=None):
         super().__init__()
@@ -28,10 +23,9 @@ class charButton(pygame.sprite.Sprite):
         self.pos = pos
         self.rect = self.surf.get_rect(center=self.pos)
         self.name = name
-        self.font = pygame.font.SysFont(font, 30)
+        self.font = font
 
-        self.textSurf, self.textRect = text_objects(self.name, self.font, WHITE)
-        self.textRect.center = (self.pos[0], self.pos[1] - 60)
+        self.text = text.Text(self.name, self.font, 30, WHITE, (self.pos[0], self.pos[1] - 60), display)
 
         self.display = display
 
@@ -49,7 +43,7 @@ class charButton(pygame.sprite.Sprite):
 
     def update(self):
         self.button.update()
-        self.display.blit(self.textSurf, self.textRect)
+        self.text.draw()
         self.display.blit(self.image, self.image_rect)
 
     def get_pressed(self, click):

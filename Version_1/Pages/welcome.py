@@ -1,6 +1,8 @@
 import pygame
 from pygame.locals import *
 import sys
+from Version_1.GUI_Elements import text
+from Version_1.GUI_Elements.text import font
 
 pygame.init()
 pygame.mixer.init()
@@ -18,18 +20,15 @@ DARK_GRAY = (125, 125, 150)
 
 FPS = 60
 FramePerSec = pygame.time.Clock()
-displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
+display = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Platform Fighter")
-
-
-def text_objects(text, font, colour):
-    textSurface = font.render(text, True, colour)
-    return textSurface, textSurface.get_rect()
 
 
 def startScreen():
     intro = True
     frame_count = 0
+    bigText = text.Text("Platform Fighter", font, 90, BLUE, (0, HEIGHT / 2), display)
+    smallText = text.Text("Press Space to Start", font, 45, DARK_BLUE, (0, HEIGHT / 2 + 100), display)
 
     while intro:
         for event in pygame.event.get():
@@ -42,21 +41,15 @@ def startScreen():
                 if event.key == K_F11:
                     pygame.display.toggle_fullscreen()
 
-        displaysurface.fill(BLACK)
+        display.fill(BLACK)
         if frame_count < 60:
             frame_count += 1
 
-        largeText = pygame.font.SysFont('impact', 90)
-        smallText = pygame.font.SysFont('impact', 45)
+        bigText.update(bigText.text, (((frame_count ** 2) / 9), (HEIGHT / 2)))
+        smallText.update(smallText.text, (WIDTH - ((frame_count ** 2) / 9), (HEIGHT / 2 + 100)))
 
-        TextSurf, TextRect = text_objects("Platform Fighter", largeText, BLUE)
-        smallTextSurf, smallTextRect = text_objects("Press Space to Start", smallText, DARK_BLUE)
-
-        TextRect.center = (((frame_count ** 2) / 9), (HEIGHT / 2))
-        smallTextRect.center = (WIDTH - ((frame_count ** 2) / 9), (HEIGHT / 2 + 100))
-
-        displaysurface.blit(TextSurf, TextRect)
-        displaysurface.blit(smallTextSurf, smallTextRect)
+        bigText.draw()
+        smallText.draw()
 
         pygame.display.update()
         FramePerSec.tick(FPS)

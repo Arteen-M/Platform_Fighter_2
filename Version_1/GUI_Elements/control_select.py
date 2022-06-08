@@ -1,9 +1,8 @@
 import pygame
 from pygame.locals import *
-from GUI_Elements import button
-
-
-font = 'impact'
+from Version_1.GUI_Elements import button
+from Version_1.GUI_Elements import text
+from Version_1.GUI_Elements.text import font
 
 
 input_list = [K_TAB, K_CLEAR, K_RETURN, K_PAUSE, K_SPACE, K_QUOTE, K_MINUS,
@@ -29,25 +28,15 @@ GRAY = (125, 125, 125)
 DARK_GRAY = (125, 125, 150)
 
 
-def text_objects(text, font, colour):
-    textSurface = font.render(text, True, colour)
-    return textSurface, textSurface.get_rect()
-
-
 class controlButton:
     def __init__(self, name, control, pos, display, bigSize=32, smallSize=20):
         self.name = name
         self.control = control
         self.pos = pos
 
-        self.bigFont = pygame.font.SysFont(font, bigSize)
-        self.smallFont = pygame.font.SysFont(font, smallSize)
+        self.nameText = text.Text(self.name, font, bigSize, WHITE, self.pos, display)
 
-        self.nameSurf, self.nameRect = text_objects(self.name, self.bigFont, WHITE)
-        self.nameRect.center = (self.pos[0], self.pos[1])
-
-        self.controlSurf, self.controlRect = text_objects(pygame.key.name(self.control), self.smallFont, WHITE)
-        self.controlRect.center = (self.pos[0], self.pos[1] + 40)
+        self.controlText = text.Text(pygame.key.name(self.control), font, smallSize, WHITE, (self.pos[0], self.pos[1] + 40), display)
 
         self.color = DARK_RED
         self.border = DARKER_RED
@@ -62,17 +51,15 @@ class controlButton:
 
         pygame.draw.rect(self.display, self.color, (self.pos[0] - 25, self.pos[1] - 25, 50, 50))
         pygame.draw.rect(self.display, self.border, (self.pos[0] - 25, self.pos[1] - 25, 50, 50), 5)
-        self.display.blit(self.nameSurf, self.nameRect)
-        self.display.blit(self.controlSurf, self.controlRect)
+        self.nameText.draw()
+        self.controlText.draw()
 
         if self.button.pressed or self.pressed:
             self.pressed = True
             for key in input_list:
                 if pressed_keys[key]:
                     self.control = key
-                    self.controlSurf, self.controlRect = text_objects(pygame.key.name(self.control),
-                                                                      self.smallFont, WHITE)
-                    self.controlRect.center = (self.pos[0], self.pos[1] + 40)
+                    self.controlText.update(pygame.key.name(self.control), self.controlText.pos)
                     self.pressed = False
 
         if self.button.pressed or self.pressed:

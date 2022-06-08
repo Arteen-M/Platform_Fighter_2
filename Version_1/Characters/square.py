@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import *
-from Characters.Character_Elements import hitbox
+from Version_1.Characters.Character_Elements import hitbox
 import math
 
 vec = pygame.math.Vector2
@@ -65,7 +65,7 @@ class Square(pygame.sprite.Sprite):
         self.attack = self.controls[4]
 
         self.tapped_up = False
-        self.max_jumps = 4
+        self.max_jumps = 4 + 1
         self.air_jumps = self.max_jumps
 
         self.on_ground = False
