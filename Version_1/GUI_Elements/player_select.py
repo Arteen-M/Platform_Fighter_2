@@ -1,21 +1,23 @@
+# -------------------------------------------------------------------------
+# IMPORTS
+# -------------------------------------------------------------------------
 import pygame
 from Version_1.GUI_Elements import button
 from Version_1.GUI_Elements import text
 from Version_1.GUI_Elements.text import font
 
+# -------------------------------------------------------------------------
+# Variable Definitions
+# -------------------------------------------------------------------------
 WIDTH = 800
 HEIGHT = 600
-
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
-DARK_BLUE = (0, 0, 200)
-BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GRAY = (125, 125, 125)
-DARK_GRAY = (125, 125, 150)
 
 
+# -------------------------------------------------------------------------
+# Class Definitions
+# -------------------------------------------------------------------------
 class playerSelect(pygame.sprite.Sprite):
     def __init__(self, player, pos, color, display):
         super().__init__()
