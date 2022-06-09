@@ -1,10 +1,15 @@
+# -------------------------------------------------------------------------
+# IMPORTS
+# -------------------------------------------------------------------------
 import pygame
 from pygame.locals import *
 from Version_1.GUI_Elements import button
 from Version_1.GUI_Elements import text
 from Version_1.GUI_Elements.text import font
 
-
+# -------------------------------------------------------------------------
+# Variable Definitions
+# -------------------------------------------------------------------------
 input_list = [K_TAB, K_CLEAR, K_RETURN, K_PAUSE, K_SPACE, K_QUOTE, K_MINUS,
              K_0, K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9, K_SEMICOLON, K_EQUALS, K_LEFTBRACKET,
              K_BACKSLASH, K_RIGHTBRACKET, K_BACKQUOTE, K_a, K_b, K_c, K_d, K_e, K_f, K_g, K_h, K_i, K_j, K_k,
@@ -15,19 +20,16 @@ input_list = [K_TAB, K_CLEAR, K_RETURN, K_PAUSE, K_SPACE, K_QUOTE, K_MINUS,
 WIDTH = 800
 HEIGHT = 600
 
-RED = (255, 0, 0)
 DARK_RED = (125, 0, 0)
 DARKER_RED = (75, 0, 0)
-GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
-YELLOW = (255, 255, 0)
 DARK_BLUE = (0, 0, 200)
-BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-GRAY = (125, 125, 125)
-DARK_GRAY = (125, 125, 150)
 
 
+# -------------------------------------------------------------------------
+# Class Definitions
+# -------------------------------------------------------------------------
 class controlButton:
     def __init__(self, name, control, pos, display, bigSize=32, smallSize=20):
         self.name = name
@@ -54,14 +56,19 @@ class controlButton:
         self.nameText.draw()
         self.controlText.draw()
 
+        # if the button is pressed
         if self.button.pressed or self.pressed:
             self.pressed = True
+            # If the key is in the valid input list
             for key in input_list:
+                # if that key is pressed
                 if pressed_keys[key]:
+                    # Update the control and control text
                     self.control = key
-                    self.controlText.update(pygame.key.name(self.control), self.controlText.pos)
+                    self.controlText.update(pygame.key.name(self.control))
                     self.pressed = False
 
+        # Change color
         if self.button.pressed or self.pressed:
             self.color = BLUE
             self.border = DARK_BLUE
@@ -73,6 +80,7 @@ class controlButton:
         self.button.get_pressed(click)
 
 
+# Bunch of buttons arranged specifically
 class controlPanel:
     def __init__(self, display, controls=(K_LEFT, K_RIGHT, K_UP, K_DOWN, K_h), pos=(WIDTH/2, HEIGHT/2)):
         self.controls = controls
@@ -98,6 +106,7 @@ class controlPanel:
         self.up.get_pressed(click)
         self.attack.get_pressed(click)
 
+    # Changing the entire control scheme at once (new name)
     def reInit(self, controls):
         self.controls = controls
         self.left = controlButton("<", self.controls[0], (self.pos[0] - 60, self.pos[1] + 50), self.display)

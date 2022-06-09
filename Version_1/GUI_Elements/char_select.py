@@ -1,21 +1,22 @@
+# -------------------------------------------------------------------------
+# IMPORTS
+# -------------------------------------------------------------------------
 import pygame
 from Version_1.GUI_Elements import button
 from Version_1.GUI_Elements import text
 from Version_1.GUI_Elements.text import font
 
+# -------------------------------------------------------------------------
+# Variable Definitions
+# -------------------------------------------------------------------------
 WIDTH = 800
 HEIGHT = 600
-
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
-DARK_BLUE = (0, 0, 200)
-BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-GRAY = (125, 125, 125)
-DARK_GRAY = (125, 125, 150)
 
 
+# -------------------------------------------------------------------------
+# Class Definition
+# -------------------------------------------------------------------------
 class charButton(pygame.sprite.Sprite):
     def __init__(self, pos, name, display, color, image=None):
         super().__init__()
@@ -25,6 +26,7 @@ class charButton(pygame.sprite.Sprite):
         self.name = name
         self.font = font
 
+        # Text for character name
         self.text = text.Text(self.name, self.font, 30, WHITE, (self.pos[0], self.pos[1] - 60), display)
 
         self.display = display
@@ -39,12 +41,15 @@ class charButton(pygame.sprite.Sprite):
 
         self.image_rect = self.image.get_rect(center=(self.pos[0], self.pos[1] + 15))
 
+        # Button for selecting
         self.button = button.Button(self.rect.x, self.rect.y, self.rect.w, self.rect.h, (), WHITE, WHITE, self.display, rect=True, draw=False, border=True)
 
     def update(self):
+        # Draw everything
         self.button.update()
         self.text.draw()
         self.display.blit(self.image, self.image_rect)
 
     def get_pressed(self, click):
+        # Set the button state
         self.button.get_pressed(click)

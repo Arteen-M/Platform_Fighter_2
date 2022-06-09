@@ -82,7 +82,9 @@ def gameLoop(characters, controls, skins, times=1, stocks=3):
                         P2.tapped_up = True
                 # Pause menu
                 if event.key == K_ESCAPE:
-                    pause.Pause()  # Pause the game
+                    # Pause the game
+                    if pause.Pause() == "Character Select":  # If the pause menu wants to get out, then return
+                        return
                     timerObj.reInit()  # Reset the timer (Don't restart it though)
 
         display.fill(BLACK)  # Clear the screen
