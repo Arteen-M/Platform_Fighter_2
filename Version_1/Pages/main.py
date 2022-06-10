@@ -44,7 +44,7 @@ while True:
         next_page, time, stocks = ["Game", None, None]
     # Character Select (Determines characters, skins and controls)
     elif next_page == "Character Select":
-        next_page, characters, skins, controls = character_select.characterSelect()
+        next_page, characters, skins, controls, time, stocks = character_select.characterSelect()
     # Main game loop
     elif next_page == "Game":
         game.gameLoop(characters, controls, skins, time, stocks)

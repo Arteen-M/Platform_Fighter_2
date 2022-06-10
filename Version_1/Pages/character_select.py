@@ -10,7 +10,8 @@ from Version_1.GUI_Elements import player_select
 from Version_1.GUI_Elements import button
 from Version_1.GUI_Elements import text
 from Version_1.GUI_Elements.text import font
-from Version_1.Pages import control_changes
+from Version_1.Pages import control_changes as cc
+from Version_1.Pages import settings as s
 
 # -------------------------------------------------------------------------
 # Variable Definitions
@@ -49,6 +50,8 @@ def characterSelect():
     square_select = char_select.charButton((400, 200), "Square", display, RED)
     # Button for moving to the control menu
     controls = button.Button(50, 50, 50, 50, None, None, RED, display, image="../Images/Controls.png")
+    # Button for moving to the settings menu
+    settings = button.Button(700, 50, 50, 50, None, None, RED, display, image="../Images/settings.png")
 
     # Read the file containing controls
     try:
@@ -74,6 +77,10 @@ def characterSelect():
     # Which player is choosing
     choose = text.Text("", font, 30, RED, (WIDTH / 2, 55), display)
 
+    # Settings information
+    time = 3
+    stocks = 3
+
     while True:
         # Whoever is choosing, display the appropriate text
         if P1_choosing:
@@ -94,7 +101,7 @@ def characterSelect():
                 if event.key == K_RETURN:
                     if characters[0] != "" and characters[1] != "":
                         # Return everything required
-                        return "Game", characters, current_skins, player_controls
+                        return "Game", characters, current_skins, player_controls, time, stocks
 
             # If you click down
             if event.type == MOUSEBUTTONDOWN:
@@ -103,12 +110,14 @@ def characterSelect():
                 p2_select.get_pressed(True)
                 square_select.get_pressed(True)
                 controls.get_pressed(True)
+                settings.get_pressed(True)
             else:
                 # If you aren't clicking down, set them all to false
                 p1_select.get_pressed(False)
                 p2_select.get_pressed(False)
                 square_select.get_pressed(False)
                 controls.get_pressed(False)
+                settings.get_pressed(False)
 
         # Clear the screen
         display.fill(BLACK)
@@ -118,6 +127,7 @@ def characterSelect():
         # Update (Draw) the buttons
         controls.update()
         square_select.update()
+        settings.update()
 
         # If both characters are chosen, then display the text to continue
         if characters[0] != "" and characters[1] != "":
@@ -126,9 +136,16 @@ def characterSelect():
         # If the control button is pressed
         if controls.pressed:
             # Move to the control menu
-            player_controls = control_changes.controlChange()
+            player_controls = cc.controlChange()
             # Make sure the button isn't pressed
             controls.pressed = False
+
+        # if the settings button is pressed
+        if settings.pressed:
+            # Move to the settings menu
+            time, stocks = s.Settings(time, stocks)
+            # Make sure the button isn't pressed
+            settings.pressed = False
 
         # Skins for both players
         current_skins = [p1_select.skin, p2_select.skin]

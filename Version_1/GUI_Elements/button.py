@@ -1,8 +1,7 @@
 # -------------------------------------------------------------------------
-# IMPORTS (and one variable)
+# IMPORT
 # -------------------------------------------------------------------------
 import pygame
-GRAY = (125, 125, 125)
 
 
 # -------------------------------------------------------------------------
@@ -48,11 +47,9 @@ class Button:
                     pygame.draw.rect(self.display, self.border_color, (self.x, self.y, self.w, self.h), 1)
             else:
                 pygame.draw.polygon(self.display, self.solid_color, self.shape)
-        elif self.border:
-            if self.rect:
-                pygame.draw.rect(self.display, self.border_color, (self.x, self.y, self.w, self.h), 1)
-            else:
-                pygame.draw.polygon(self.display, self.border_color, self.shape, 1)
+
+        if self.border:
+            pygame.draw.rect(self.display, self.border_color, (self.x, self.y, self.w, self.h), 1)
 
         if self.image is not None:
             self.display.blit(self.image, self.image_rect)

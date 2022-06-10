@@ -33,9 +33,9 @@ pygame.display.set_caption("Platform Fighter")
 # -------------------------------------------------------------------------
 # Main Loop
 # -------------------------------------------------------------------------
-def gameLoop(characters, controls, skins, times=1, stocks=3):
+def gameLoop(characters, controls, skins, times=3, stock=3):
     num_time = times  # Set the time
-    stocks = stocks  # Set the stocks
+    stocks = stock  # Set the stocks
 
     # Initialize the timer
     timerObj = timer.Timer(num_time, font, 36, WHITE, (WIDTH - 100, 100), display)
