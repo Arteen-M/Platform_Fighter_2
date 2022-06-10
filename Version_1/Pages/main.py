@@ -39,11 +39,8 @@ controls = None  # List of controls for each player
 # Main Loop
 # -------------------------------------------------------------------------
 while True:
-    # Settings page (Not implemented)
-    if next_page == "Settings":
-        next_page, time, stocks = ["Game", None, None]
     # Character Select (Determines characters, skins and controls)
-    elif next_page == "Character Select":
+    if next_page == "Character Select":
         next_page, characters, skins, controls, time, stocks = character_select.characterSelect()
     # Main game loop
     elif next_page == "Game":
