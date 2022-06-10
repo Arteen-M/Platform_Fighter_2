@@ -9,6 +9,7 @@ HEIGHT = 600
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GRAY = (125, 125, 125)
+RED = (255, 0, 0)
 
 
 # The dropdown for the names (only player 1 and 2 right now)
