@@ -28,7 +28,7 @@ from Version_1.Pages import character_select
 # Variable Definitions
 # -------------------------------------------------------------------------
 next_page = ""  # String to define where the program goes after returning from a page (Default Welcome)
-time = 1  # Time in minutes (Default 1)
+time = 3  # Time in minutes (Default 3)
 stocks = 3  # Stocks (Default 3)
 characters = [None, None]  # Characters selected for each player
 skins = [None, None]  # Skins for each player (attached to each character)
