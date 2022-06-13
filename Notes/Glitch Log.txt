@@ -2,9 +2,12 @@ Version 2:
 
 Unresolved Glitches:
 4. When entering new controls, the text appears off center, but corrects once the page is refreshed or closed
+6. The game exists
+
 
 Possible Solutions/ Problems:
 4. The rect isn't being centered like it should on input, but it is when read from the file
+6. Delete the game
 
 Discovered Glitches:
 1. Observed in Normal Gameplay (Single Player Testing)

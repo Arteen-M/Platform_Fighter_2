@@ -49,10 +49,15 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
         # Create a square character
         P1 = square.Square(display, color=skins[0], spawn_position=((WIDTH / 2) - 100, HEIGHT / 2), controls=list(controls["Player 1"].values()), stocks=stocks)
         P1_Graphic = graphic.Graphic(display, font, 36, (275, 500), skins[0], stocks=stocks)
+    else:
+        raise Exception("No Character Selected. How did you do that?")
+
     if characters[1] == "Square":
         # Create a square character
         P2 = square.Square(display, color=skins[1], spawn_position=((WIDTH / 2) + 100, HEIGHT / 2), controls=list(controls["Player 2"].values()), stocks=stocks)
         P2_Graphic = graphic.Graphic(display, font, 36, (525, 500), skins[1], stocks=stocks)
+    else:
+        raise Exception("No Character Selected. How did you do that?")
 
     # Initialize the floor
     mainFloor = floor.Floor(display, dimensions=(WIDTH/2, 10), pos=(WIDTH / 2, 418))
