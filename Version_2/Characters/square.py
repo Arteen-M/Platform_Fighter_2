@@ -5,6 +5,7 @@ import pygame
 from pygame.locals import *
 from Version_2.Characters.Character_Elements import hitbox
 import math
+import time
 
 # -------------------------------------------------------------------------
 # Variable Definitions
@@ -38,8 +39,8 @@ class Square(pygame.sprite.Sprite):  # Inherit from the sprite class
 
         # Movement Constants
         self.gravity = 0.25  # Gravitational constant (previously 0.17)
-        self.fall_speed = 8  # Fall Speed
-        self.fast_fall = 9.5  # Fast Fall Speed (unused)
+        self.fall_speed = 7  # Fall Speed
+        self.fast_fall = 8  # Fast Fall Speed
         self.ground_acc = 0.6  # Acceleration on the ground
         self.lag_ground_acc = 0.1  # Acceleration on the ground during attack lag
         self.current_ground_acc = self.ground_acc  # Switches between the two accelerations
@@ -48,6 +49,7 @@ class Square(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.current_air_acc = self.air_acc  # Switches between the two accelerations
         self.momentum_acc = 0.1  # Acceleration (Resistance) during momentum
         self.jump_acc = -5.0  # Acceleration after jumping (previously -4.8)
+        self.dash_speed = 10.0
 
         # Character Attributes
         self.percentage = 0.0  # Percentage (is a float but only increments in integers)
@@ -78,24 +80,32 @@ class Square(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.max_jumps = 4 + 1  # Maximum air jumps (previously 4)
         self.air_jumps = self.max_jumps  # Current jumps in the air
 
+        self.max_dash = 2
+        self.num_dash = 2
+
         # Character States
         self.on_ground = False  # On the ground or not
         self.on_plat = False  # On platform or not
         self.direction = True  # Which direction the character is facing (True = Right)
+        self.pressed_down = 0
+        self.pressed_left = 0
+        self.pressed_right = 0
+        self.going_down = False
         self.invincibility = 0  # If the character is currently invincible (usually on respawn)
         self.frozen = 0  # If the character can't move (with no influence) (usually on respawn)
         self.lag = 0  # Attack lag
         self.hitstun = 0  # Hitstun (after being hit by an opponent)
         self.momentum = 0  # Momentum (after you gain control from hitstun, but your momentum sticks around)
         self.knockback = vec(0, 0)  # Knockback Vector (x and y)
+        self.got_hit = False
 
         # Hitboxes for each usable attack
-        #                               size       display   lag  sf  ef dir  angle    dmg b  s  hitstun  color
-        self.n_attack = hitbox.HitBox((60, 60), self.display, 20, 15, 5, 1, (0.5, 0.5), 5, 1, 0.2, 5, self.color)
-        self.f_attack = hitbox.HitBox((20, 20), self.display, 20, 15, 5, 1, (0.6, 0.4), 7, 1.5, 0.2, 3, self.color)
-        self.b_attack = hitbox.HitBox((40, 15), self.display, 20, 15, 5, 1, (-0.65, 0.35), 8, 1, 0.2, 3, self.color)
-        self.u_attack = hitbox.HitBox((40, 30), self.display, 20, 15, 5, 1, (0.15, 0.7), 4, 1.2, 0.3, 5, self.color)
-        self.d_attack = hitbox.HitBox((50, 30), self.display, 20, 15, 5, 1, (0.05, -0.6), 10, 1.5, 0.3, 5, self.color)
+        #                                name      size       display   lag  sf  ef dir  angle    dmg b  s  hitstun  color
+        self.n_attack = hitbox.HitBox("Neutral", (60, 60), self.display, 20, 15, 5, 1, (0.5, 0.5), 5, 1, 0.2, 5, self.color)
+        self.f_attack = hitbox.HitBox("Forward", (20, 20), self.display, 20, 15, 5, 1, (0.6, 0.4), 7, 1.5, 0.2, 3, self.color)
+        self.b_attack = hitbox.HitBox("Back", (40, 15), self.display, 20, 15, 5, 1, (-0.65, 0.35), 8, 1, 0.2, 3, self.color)
+        self.u_attack = hitbox.HitBox("Up", (40, 30), self.display, 20, 15, 5, 1, (0.15, 0.7), 4, 1.2, 0.3, 5, self.color)
+        self.d_attack = hitbox.HitBox("Down", (50, 30), self.display, 20, 15, 5, 1, (0.05, -0.6), 10, 1.5, 0.3, 5, self.color)
 
         # Hitbox groupss
         self.all_hitboxes = [self.n_attack, self.f_attack, self.b_attack, self.u_attack, self.d_attack]
@@ -132,6 +142,18 @@ class Square(pygame.sprite.Sprite):  # Inherit from the sprite class
     def countFrozen(self):
         if self.frozen > 0:
             self.frozen -= 1
+
+    def countPressedDown(self):
+        if self.pressed_down > 0:
+            self.pressed_down -= 1
+
+    def countPressedLeft(self):
+        if self.pressed_left > 0:
+            self.pressed_left -= 1
+
+    def countPressedRight(self):
+        if self.pressed_right > 0:
+            self.pressed_right -= 1
 
     # The formula for knockback (I stole this from SmashWiki)
     def knockbackFormula(self, angle, damage, scale, base, mod):
@@ -178,7 +200,7 @@ class Square(pygame.sprite.Sprite):  # Inherit from the sprite class
         soft_floor_collide = pygame.sprite.spritecollide(self, soft_floors, False)
         under_floor_collide = pygame.sprite.spritecollide(self, under_floors, False)
 
-        if soft_floor_collide and self.vel.y >= 0 and not under_floor_collide:
+        if soft_floor_collide and self.vel.y >= 0 and not under_floor_collide and not self.going_down:
             self.acc.y = 0
             self.vel.y = 0
             self.on_plat = True
@@ -202,6 +224,32 @@ class Square(pygame.sprite.Sprite):  # Inherit from the sprite class
             # Gravity
             self.acc.y = self.gravity
 
+    def goingDown(self):
+        pressed_keys = pygame.key.get_pressed()
+        if pressed_keys[self.down] and 8 >= self.pressed_down > 0:
+            self.going_down = True
+            self.vel.y = self.fast_fall
+        elif pressed_keys[self.down]:
+            self.pressed_down = 10
+
+    def dash(self):
+        pressed_keys = pygame.key.get_pressed()
+        if pressed_keys[self.left] and 8 >= self.pressed_left > 0:
+            self.vel.x = -1 * self.dash_speed
+            self.vel.y = 0
+        elif pressed_keys[self.left]:
+            self.pressed_left = 10
+
+        if pressed_keys[self.right] and 8 >= self.pressed_right > 0:
+            self.vel.x = self.dash_speed
+            self.vel.y = 0
+        elif pressed_keys[self.right]:
+            self.pressed_right = 10
+
+    # def fastFall(self):
+    #    if self.going_down:
+    #        self.vel.y = self.fast_fall
+
     # Similar to the floor collide, but change the grounded state instead
     def stateChange(self, floors):
         # Returns a list of floors where the rects overlap with self (Dokill = False)
@@ -213,10 +261,14 @@ class Square(pygame.sprite.Sprite):  # Inherit from the sprite class
                 # Cancel lag and momentum
                 self.lag = 0
                 self.momentum = 0
+                self.going_down = False
                 # Reset any hitboxes
-                for hitBox in self.all_hitboxes:
-                    if hitBox.active:
-                        hitBox.reset()
+                for hitbox in self.all_hitboxes:
+                    if self.active_hitboxes.has(hitbox):
+                        self.active_hitboxes.remove(hitbox)
+                        hitbox.reset()
+                    if hitbox.running:
+                        hitbox.reset()
 
             # If you hit the ground, you are on the ground
             self.on_ground = True
@@ -226,9 +278,12 @@ class Square(pygame.sprite.Sprite):  # Inherit from the sprite class
                 # Cancel lag
                 self.lag = 0
                 # Reset any hitboxes
-                for hitBox in self.all_hitboxes:
-                    if hitBox.active:
-                        hitBox.reset()
+                for hitbox in self.all_hitboxes:
+                    if self.active_hitboxes.has(hitbox):
+                        self.active_hitboxes.remove(hitbox)
+                        hitbox.reset()
+                    if hitbox.running:
+                        hitbox.reset()
 
             # You are now not on the ground
             self.on_ground = False
@@ -364,6 +419,7 @@ class Square(pygame.sprite.Sprite):  # Inherit from the sprite class
 
             # If you are in the air and have available jumps
             if self.tapped_up and not self.on_ground and self.air_jumps > 0:
+                self.going_down = False
                 self.vel.y = 0  # Stop your airborne velocity
                 self.acc.y = self.jump_acc  # Jump
                 self.air_jumps -= 1  # One less air jump
@@ -391,6 +447,11 @@ class Square(pygame.sprite.Sprite):  # Inherit from the sprite class
             # Remove it if the hitbox becomes deactive and it is still in the group
             elif not hitbox.active and self.active_hitboxes.has(hitbox):
                 self.active_hitboxes.remove(hitbox)
+
+    def drawHitbox(self):
+        for hitbox in self.all_hitboxes:
+            if hitbox.active:
+                hitbox.draw()
 
     # Neutral attack
     def neutralAttack(self):
@@ -487,6 +548,11 @@ class Square(pygame.sprite.Sprite):  # Inherit from the sprite class
         if hit:
             # Only accounts for the first hitbox you get hit by
             box = hit[0]
+            self.got_hit = True
+
+            for x in self.all_hitboxes:
+                x.reset()
+            self.active_hitboxes.empty()
 
             # Take the percentage damage of the hitbox
             self.percentage += box.damage
@@ -506,6 +572,8 @@ class Square(pygame.sprite.Sprite):  # Inherit from the sprite class
             # Set their hitstun and momentum based on the power of the attack
             self.hitstun = math.floor(self.hitstunFormula(velocity, box.hitstun, box.damage))
             self.momentum = math.floor(self.hitstun * math.ceil(box.hitstun) + 1)
+        else:
+            self.got_hit = False
 
     # Function containing all the previous ones, to run in one cycle
     def update(self, hard_floors, soft_floors, under_floors, walls, opponent_hitboxes):
@@ -518,10 +586,21 @@ class Square(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.countMomentum()
         self.countInvincibility()
         self.countFrozen()
+        self.countPressedDown()
+        self.countPressedLeft()
+        self.countPressedRight()
+
+        # CONDITIONAL MOVEMENT (CONDITIONAL)
+        if not (self.frozen or self.lag or self.hitstun):
+            if not self.momentum:
+                self.goingDown()
+                self.dash()
+
         if not self.frozen:  # Frozen is absolute
             # COLLISION FUNCTIONS (CONDITIONAL)
             self.floorCollide(hard_floors)
             self.platformCollide(soft_floors, under_floors)
+            # self.goingDown()
             self.wallCollide(walls)
             # STATE CHANGES (CONDITIONAL)
             self.stateChange(hard_floors)
@@ -550,4 +629,5 @@ class Square(pygame.sprite.Sprite):  # Inherit from the sprite class
             if not self.invincibility:  # invincibility just means you can't get hit
                 self.getHit(opponent_hitboxes)
         # ANIMATING (ALWAYS)
+        self.drawHitbox()
         self.draw()

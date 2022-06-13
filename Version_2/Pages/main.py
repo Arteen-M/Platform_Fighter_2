@@ -12,7 +12,6 @@
 # Knock them out of the blast zone to eliminate their lives (known as stocks).
 # Eliminate all their stocks to win.
 #
-#
 # Input: Keyboard and Mouse inputs
 # Output: No distinct output (GUI)
 # -------------------------------------------------------------------------
@@ -41,10 +40,10 @@ controls = None  # List of controls for each player
 while True:
     # Character Select (Determines characters, skins and controls)
     if next_page == "Character Select":
-        next_page, characters, skins, controls, time, stocks = character_select.characterSelect()
+        next_page, characters, skins, controls, time, stocks, debug = character_select.characterSelect()
     # Main game loop
     elif next_page == "Game":
-        game.gameLoop(characters, controls, skins, time, stocks)
+        game.gameLoop(characters, controls, skins, time, stocks, debug)
         next_page = "Character Select"
     # Start Screen
     else:

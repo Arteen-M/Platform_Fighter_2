@@ -1,0 +1,37 @@
+Version 2:
+
+Unresolved Glitches:
+4. When entering new controls, the text appears off center, but corrects once the page is refreshed or closed
+
+Possible Solutions/ Problems:
+4. The rect isn't being centered like it should on input, but it is when read from the file
+
+Discovered Glitches:
+1. Observed in Normal Gameplay (Single Player Testing)
+2. Observed in Normal Gameplay (Multi Player Testing)
+3. Observed in Normal Gameplay (Multi PLayer Testing)
+4. Observed in Menu Navigation (Single Player Testing)
+5. Observed through theory-crafting (Single Player Testing)
+
+Fixed Glitches:
+1. When landing, two attacks could be used at once.
+2. When a player presses/ holds an attack key, some key combinations stop working for the opponent
+3. Players hitboxes linger after being hit
+5. Vertical knockback is canceled by fast falling
+
+Problems:
+1. Landing resets your lag and the active hitbox, but if you timed the landing in the startup frames,
+it wouldn't reset, allowing you to attack with two attacks at once.
+2. Two special character inputs don't seem to work well together in pygame (further testing is required)
+3. Hitboxes and their attributes didn't reset after getting hit
+5. Fast falling overrides knockback velocity and wasn't limited by lag or hitstun or momentum
+
+Solutions:
+1. Check all hitboxes to see if they're running when they land. If they are, reset them, along with
+the other reset conditions
+2. No Solution (remove access to special characters entirely?)
+3. Reset all hitboxes and clear the active hitbox sprite group
+5. Limit fast falling to only a neutral state
+
+
+

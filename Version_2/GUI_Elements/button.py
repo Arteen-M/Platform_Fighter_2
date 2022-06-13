@@ -45,7 +45,7 @@ class Button:
                 pygame.draw.rect(self.display, self.solid_color, (self.x, self.y, self.w, self.h))
                 if self.border:
                     pygame.draw.rect(self.display, self.border_color, (self.x, self.y, self.w, self.h), 1)
-            else:
+            elif self.shape is not None:
                 pygame.draw.polygon(self.display, self.solid_color, self.shape)
 
         if self.border:

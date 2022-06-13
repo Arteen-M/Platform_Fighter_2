@@ -1,0 +1,22 @@
+Version 2:
+
+Updated the Graphic:
+- Stock icons shrunk and moved to below the percentage icon
+- Stock icons are in rows of three (moved under once the row exceeds three)
+- Added a white backdrop so the stocks and percentage are easy to see
+
+Updated the Skin Select:
+- You can no longer "fight" for skins
+    - Switching to a skin your opponent occupies no longer kicks them off that skin
+
+Square Properties:
+- Square can now fast fall by double tapping
+- Square can now fall through platforms by double tapping
+- Landing now resets your attacks entirely, not just during active frames
+- Added hit SFX
+- Added Dashing (double tapping a direction)
+
+Entire Game:
+- Added Music
+    - Character Select Music
+    - Main Game Music

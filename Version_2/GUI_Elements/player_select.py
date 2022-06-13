@@ -58,20 +58,27 @@ class playerSelect(pygame.sprite.Sprite):
             self.skins = skins
             self.skin = self.skins[self.skin_position]
 
-            if self.backButton.pressed:
-                if self.skin_position == 0:
-                    self.skin_position = len(self.skins) - 1
-                else:
-                    self.skin_position -= 1
-                self.backButton.pressed = False
+            if self.skin is not None:
+                if self.backButton.pressed:
+                    if self.skin_position == 0:
+                        self.skin_position = len(self.skins) - 1
+                    else:
+                        self.skin_position -= 1
+                    self.backButton.pressed = False
 
-            if self.forwardButton.pressed:
-                if self.skin_position == len(self.skins) - 1:
+                if self.forwardButton.pressed:
+                    if self.skin_position == len(self.skins) - 1:
+                        self.skin_position = 0
+                    else:
+                        self.skin_position += 1
+
+                    self.forwardButton.pressed = False
+            else:
+                if self.skin_position >= len(self.skins) - 1:
                     self.skin_position = 0
                 else:
                     self.skin_position += 1
-
-                self.forwardButton.pressed = False
+                self.skin = self.skins[self.skin_position]
 
         if character == "Square":
             self.characterSurf = pygame.Surface((100, 100))

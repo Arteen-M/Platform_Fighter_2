@@ -11,7 +11,7 @@ from Version_2.Stage_Elements import wall
 from Version_2.Characters.Character_Elements import graphic
 from Version_2.Stage_Elements import timer
 from Version_2.Pages import pause
-from Version_2.GUI_Elements.text import font
+from Version_2.GUI_Elements.text import font, Text
 from Version_2.Stage_Elements import background
 
 # -------------------------------------------------------------------------
@@ -19,6 +19,8 @@ from Version_2.Stage_Elements import background
 # -------------------------------------------------------------------------
 pygame.init()
 pygame.font.init()
+pygame.mixer.init()
+pygame.mixer.set_num_channels(3)
 
 WIDTH = 800
 HEIGHT = 600
@@ -35,21 +37,22 @@ pygame.display.set_caption("Platform Fighter")
 # -------------------------------------------------------------------------
 # Main Loop
 # -------------------------------------------------------------------------
-def gameLoop(characters, controls, skins, times=3, stock=3):
+def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
     num_time = times  # Set the time
     stocks = stock  # Set the stocks
 
     # Initialize the timer
     timerObj = timer.Timer(num_time, font, 36, BLACK, (WIDTH - 100, 100), display)
+    fpsObj = Text("0.0", font, 20, BLACK, (WIDTH - 100, 135), display)
 
     if characters[0] == "Square":
         # Create a square character
         P1 = square.Square(display, color=skins[0], spawn_position=((WIDTH / 2) - 100, HEIGHT / 2), controls=list(controls["Player 1"].values()), stocks=stocks)
-        P1_Graphic = graphic.Graphic(display, font, 36, (300, 500), skins[0], stocks=stocks)
+        P1_Graphic = graphic.Graphic(display, font, 36, (275, 500), skins[0], stocks=stocks)
     if characters[1] == "Square":
         # Create a square character
         P2 = square.Square(display, color=skins[1], spawn_position=((WIDTH / 2) + 100, HEIGHT / 2), controls=list(controls["Player 2"].values()), stocks=stocks)
-        P2_Graphic = graphic.Graphic(display, font, 36, (500, 500), skins[1], side=False, stocks=stocks)
+        P2_Graphic = graphic.Graphic(display, font, 36, (525, 500), skins[1], stocks=stocks)
 
     # Initialize the floor
     mainFloor = floor.Floor(display, dimensions=(WIDTH/2, 10), pos=(WIDTH / 2, 418))
@@ -93,6 +96,12 @@ def gameLoop(characters, controls, skins, times=3, stock=3):
 
     bg = background.Background("../Images/Background/frames/", 20, 8, display)
 
+    musicObj = pygame.mixer.Sound("../Music/PlatformBanger2 (3).wav")
+    musicObj.play(-1)
+
+    P1HitMusic = pygame.mixer.Sound("../Music/HitSfX.wav")
+    P2HitMusic = pygame.mixer.Sound("../Music/HitSfX.wav")
+
     # END CONDITIONS: P1 Loses, P2 Loses, Timeout
     while not (P1.end or P2.end or timerObj.time_out):
         # Event Loop
@@ -112,6 +121,7 @@ def gameLoop(characters, controls, skins, times=3, stock=3):
                 if event.key == K_ESCAPE:
                     # Pause the game
                     if pause.Pause() == "Character Select":  # If the pause menu wants to get out, then return
+                        musicObj.stop()
                         return
                     timerObj.reInit()  # Reset the timer (Don't restart it though)
 
@@ -122,32 +132,40 @@ def gameLoop(characters, controls, skins, times=3, stock=3):
         P1.update(hard_floors, soft_floors, under_floors, walls, P2.active_hitboxes)
         P2.update(hard_floors, soft_floors, under_floors, walls, P1.active_hitboxes)
 
+        if P1.got_hit:
+            P2HitMusic.play()
+
+        if P2.got_hit:
+            P1HitMusic.play()
+
         # Update the graphic with information
         P1_Graphic.update(P1.percentage, P1.stocks)
         P2_Graphic.update(P2.percentage, P2.stocks)
 
         # Draw all debug elements
-        for element in P1.all_hitboxes:
-            if element.active:
+        if debug:
+            for element in P1.all_hitboxes:
+                if element.active:
+                    element.draw()
+
+            for element in P2.all_hitboxes:
+                if element.active:
+                    element.draw()
+
+            for element in hard_floors:
                 element.draw()
 
-        for element in P2.all_hitboxes:
-            if element.active:
+            for element in soft_floors:
                 element.draw()
 
-        """
-        for element in hard_floors:
-            element.draw()
+            for element in under_floors:
+                element.draw()
 
-        for element in soft_floors:
-            element.draw()
+            for element in walls:
+                element.draw()
 
-        for element in under_floors:
-            element.draw()
-
-        for element in walls:
-            element.draw()
-        """
+            fpsObj.update(str(round(FramePerSec.get_fps(), 2)))
+            fpsObj.draw()
 
         # update the timer
         timerObj.update()
@@ -155,6 +173,7 @@ def gameLoop(characters, controls, skins, times=3, stock=3):
         pygame.display.update()
         FramePerSec.tick(FPS)  # CAP AT 60 FPS
 
+    musicObj.stop()
     time.sleep(2)  # Delay to allow everyone to process
 
 # gameLoop()

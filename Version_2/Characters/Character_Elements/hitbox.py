@@ -9,8 +9,9 @@ RED = (255, 0, 0)
 # Class definition
 # -------------------------------------------------------------------------
 class HitBox(pygame.sprite.Sprite):
-    def __init__(self, size, display, lag, start_flag, end_flag, direction, angle, damage, base, scale, hitstun, color=RED):
+    def __init__(self, name, size, display, lag, start_flag, end_flag, direction, angle, damage, base, scale, hitstun, color=RED):
         super().__init__()
+        self.name = name
         # Hitbox size and position
         self.surf = pygame.Surface(size)
         self.surf.set_alpha(100)  # Drawn with transparency, to indicate that it is a hitbox, not hurtbox

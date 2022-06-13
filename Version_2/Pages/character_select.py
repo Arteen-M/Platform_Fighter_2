@@ -10,6 +10,7 @@ from Version_2.GUI_Elements import player_select
 from Version_2.GUI_Elements import button
 from Version_2.GUI_Elements import text
 from Version_2.GUI_Elements.text import font
+from Version_2.GUI_Elements import check_box
 from Version_2.Pages import control_changes as cc
 from Version_2.Pages import settings as s
 
@@ -19,6 +20,8 @@ from Version_2.Pages import settings as s
 
 pygame.init()
 pygame.font.init()
+pygame.mixer.init()
+pygame.mixer.set_num_channels(3)
 
 WIDTH = 800
 HEIGHT = 600
@@ -77,16 +80,22 @@ def characterSelect():
     # Which player is choosing
     choose = text.Text("", font, 30, RED, (WIDTH / 2, 55), display)
 
+    debug = text.Text("Debug Mode:", font, 24, WHITE, (100, HEIGHT - 25), display)
+    debugBox = check_box.checkBox((40, 40), (175, HEIGHT-45), WHITE, RED, display)
+
     # Settings information
     time = 3
     stocks = 3
 
+    musicObj = pygame.mixer.Sound("../Music/MenuViber.wav")
+    musicObj.play(-1)
+
     while True:
         # Whoever is choosing, display the appropriate text
         if P1_choosing:
-            choose.update(text="Player 1, Choose your Character:", color=RED)
+            choose.update(text="Player 1: Choose your Character", color=RED)
         else:
-            choose.update(text="Player 2, Choose your Character", color=BLUE)
+            choose.update(text="Player 2: Choose your Character", color=BLUE)
 
         # Event Loop
         for event in pygame.event.get():
@@ -101,7 +110,8 @@ def characterSelect():
                 if event.key == K_RETURN:
                     if characters[0] != "" and characters[1] != "":
                         # Return everything required
-                        return "Game", characters, current_skins, player_controls, time, stocks
+                        musicObj.stop()
+                        return "Game", characters, current_skins, player_controls, time, stocks, debugBox.pressed
 
             # If you click down
             if event.type == MOUSEBUTTONDOWN:
@@ -111,6 +121,7 @@ def characterSelect():
                 square_select.get_pressed(True)
                 controls.get_pressed(True)
                 settings.get_pressed(True)
+                debugBox.get_pressed(True)
             else:
                 # If you aren't clicking down, set them all to false
                 p1_select.get_pressed(False)
@@ -118,6 +129,7 @@ def characterSelect():
                 square_select.get_pressed(False)
                 controls.get_pressed(False)
                 settings.get_pressed(False)
+                debugBox.get_pressed(False)
 
         # Clear the screen
         display.fill(BLACK)
@@ -128,6 +140,9 @@ def characterSelect():
         controls.update()
         square_select.update()
         settings.update()
+
+        debug.draw()
+        debugBox.update()
 
         # If both characters are chosen, then display the text to continue
         if characters[0] != "" and characters[1] != "":
@@ -156,9 +171,9 @@ def characterSelect():
 
         # Change the available skins list based on the opponents skin choice
         if current_skins[1] in square_skins_1:
-            square_skins_1.remove(current_skins[1])
+            square_skins_1[square_skins_1.index(current_skins[1])] = None
         if current_skins[0] in square_skins_2:
-            square_skins_2.remove(current_skins[0])
+            square_skins_2[square_skins_2.index(current_skins[0])] = None
 
         # If the character select button is pressed
         if square_select.button.pressed:
@@ -175,10 +190,10 @@ def characterSelect():
             square_select.button.pressed = False
 
         # Sets skins
-        if P1_choosing and characters[0] == "Square":
+        if characters[0] == "Square":
             skins[0] = square_skins_1
 
-        if not P1_choosing and characters[1] == "Square":
+        if characters[1] == "Square":
             skins[1] = square_skins_2
 
         # Update the player boxes
