@@ -1,0 +1,52 @@
+# Platform Fighter 2
+
+File Archetecture:
+- Notes
+  - Glitch Log.txt
+  - Patch Notes.txt (Revision History, starting from the second version)
+
+- Platform_Fighter (Current Version)
+  - Main.py
+  - Path.py
+  - Characters
+    - Character_Elements
+      - Graphic.py (Stock and Percentage)
+      - Hitbox.py
+    - Square.py
+  - GUI_Elements
+    - Button.py
+    - Char_Select.py
+    - Check_Box.py
+    - Control_Select.py
+    - Name_Dropdown.py
+    - Player_Select.py
+    - Text.py
+  - Images
+    - Background
+      - Bg.gif
+      - Frames
+        - (All Images files 0-19).png
+    - Controls.png
+    - Settings.png 
+  - Music
+    - PlatformBanger2 (3).wav
+    - MenuViber.wav
+    - HitSFX.wav
+  - Names
+    - Names.csv
+    - test.py
+  - Pages
+    - Character_Select.py
+    - Control_Changes.py
+    - Game.py
+    - Pause.py
+    - Settings.py
+    - Welcome.py
+  - Stage_Elements
+    - Background.py
+    - Floor.py
+    - Wall.py
+    - Timer.py
+
+- Version_1 (Previous Version)
+  - ...
