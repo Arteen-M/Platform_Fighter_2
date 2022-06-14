@@ -19,11 +19,12 @@
 # -------------------------------------------------------------------------
 # IMPORTS
 # -------------------------------------------------------------------------
-from Version_2.Pages import game
-from Version_2.Pages import welcome
-from Version_2.Pages import character_select
+from Pages import game
+from Pages import welcome
+from Pages import character_select
 
-# -------------------------------------------------------------------------
+
+# --------------------------------------- ----------------------------------
 # Variable Definitions
 # -------------------------------------------------------------------------
 next_page = ""  # String to define where the program goes after returning from a page (Default Welcome)
@@ -32,7 +33,7 @@ stocks = 3  # Stocks (Default 3)
 characters = [None, None]  # Characters selected for each player
 skins = [None, None]  # Skins for each player (attached to each character)
 controls = None  # List of controls for each player
-
+debug = False
 
 # -------------------------------------------------------------------------
 # Main Loop

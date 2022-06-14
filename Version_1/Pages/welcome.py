@@ -23,7 +23,7 @@ WHITE = (255, 255, 255)
 FPS = 60
 FramePerSec = pygame.time.Clock()
 display = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Platform Fighter")
+pygame.display.set_caption("Platform_Fighter")
 
 
 # -------------------------------------------------------------------------
@@ -32,7 +32,7 @@ pygame.display.set_caption("Platform Fighter")
 def startScreen():
     # Other initializations, like frames and text
     frame_count = 0
-    bigText = text.Text("Platform Fighter", font, 90, BLUE, (0, HEIGHT / 2), display)
+    bigText = text.Text("Platform_Fighter", font, 90, BLUE, (0, HEIGHT / 2), display)
     smallText = text.Text("Press Space to Start", font, 45, DARK_BLUE, (0, HEIGHT / 2 + 100), display)
 
     while True:

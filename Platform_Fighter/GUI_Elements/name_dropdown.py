@@ -1,8 +1,8 @@
 import pygame
 import pandas as pd
-from Version_2.GUI_Elements import button
-from Version_2.GUI_Elements import text
-from Version_2.GUI_Elements.text import font
+from Platform_Fighter.GUI_Elements import button
+from Platform_Fighter.GUI_Elements import text
+from Platform_Fighter.GUI_Elements.text import font
 
 WIDTH = 800
 HEIGHT = 600

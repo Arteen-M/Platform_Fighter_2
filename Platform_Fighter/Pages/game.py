@@ -5,14 +5,15 @@ import pygame
 from pygame.locals import *
 import sys
 import time
-from Version_2.Characters import square
-from Version_2.Stage_Elements import floor
-from Version_2.Stage_Elements import wall
-from Version_2.Characters.Character_Elements import graphic
-from Version_2.Stage_Elements import timer
-from Version_2.Pages import pause
-from Version_2.GUI_Elements.text import font, Text
-from Version_2.Stage_Elements import background
+from Platform_Fighter.Characters import square
+from Platform_Fighter.Stage_Elements import floor
+from Platform_Fighter.Stage_Elements import wall
+from Platform_Fighter.Characters.Character_Elements import graphic
+from Platform_Fighter.Stage_Elements import timer
+from Platform_Fighter.Pages import pause
+from Platform_Fighter.GUI_Elements.text import font, Text
+from Platform_Fighter.Stage_Elements import background
+from Platform_Fighter.path import path
 
 # -------------------------------------------------------------------------
 # Variable Definitions
@@ -99,13 +100,13 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
     walls.add(mainLeftWall)
     walls.add(mainRightWall)
 
-    bg = background.Background("../Images/Background/frames/", 20, 8, display)
+    bg = background.Background(path+"Images/Background/frames/", 20, 8, display)
 
-    musicObj = pygame.mixer.Sound("../Music/PlatformBanger2 (3).wav")
+    musicObj = pygame.mixer.Sound(path+"Music/PlatformBanger2 (3).wav")
     musicObj.play(-1)
 
-    P1HitMusic = pygame.mixer.Sound("../Music/HitSfX.wav")
-    P2HitMusic = pygame.mixer.Sound("../Music/HitSfX.wav")
+    P1HitMusic = pygame.mixer.Sound(path+"Music/HitSfX.wav")
+    P2HitMusic = pygame.mixer.Sound(path+"Music/HitSfX.wav")
 
     # END CONDITIONS: P1 Loses, P2 Loses, Timeout
     while not (P1.end or P2.end or timerObj.time_out):

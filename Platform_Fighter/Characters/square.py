@@ -3,9 +3,8 @@
 # -------------------------------------------------------------------------
 import pygame
 from pygame.locals import *
-from Version_2.Characters.Character_Elements import hitbox
+from Platform_Fighter.Characters.Character_Elements import hitbox
 import math
-import time
 
 # -------------------------------------------------------------------------
 # Variable Definitions

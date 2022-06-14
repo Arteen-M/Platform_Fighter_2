@@ -3,7 +3,7 @@
 # -------------------------------------------------------------------------
 import pygame
 import math
-from Version_2.GUI_Elements import text
+from Platform_Fighter.GUI_Elements import text
 
 
 # -------------------------------------------------------------------------

@@ -5,14 +5,15 @@ import pygame
 from pygame.locals import *
 import sys
 import pandas as pd
-from Version_2.GUI_Elements import char_select
-from Version_2.GUI_Elements import player_select
-from Version_2.GUI_Elements import button
-from Version_2.GUI_Elements import text
-from Version_2.GUI_Elements.text import font
-from Version_2.GUI_Elements import check_box
-from Version_2.Pages import control_changes as cc
-from Version_2.Pages import settings as s
+from Platform_Fighter.GUI_Elements import char_select
+from Platform_Fighter.GUI_Elements import player_select
+from Platform_Fighter.GUI_Elements import button
+from Platform_Fighter.GUI_Elements import text
+from Platform_Fighter.GUI_Elements.text import font
+from Platform_Fighter.GUI_Elements import check_box
+from Platform_Fighter.Pages import control_changes as cc
+from Platform_Fighter.Pages import settings as s
+from Platform_Fighter.path import path
 
 # -------------------------------------------------------------------------
 # Variable Definitions
@@ -52,13 +53,13 @@ def characterSelect():
     # Button for choosing the square
     square_select = char_select.charButton((400, 200), "Square", display, RED)
     # Button for moving to the control menu
-    controls = button.Button(50, 50, 50, 50, None, None, RED, display, image="../Images/Controls.png")
+    controls = button.Button(50, 50, 50, 50, None, None, RED, display, image=path+"Images/Controls.png")
     # Button for moving to the settings menu
-    settings = button.Button(700, 50, 50, 50, None, None, RED, display, image="../Images/settings.png")
+    settings = button.Button(700, 50, 50, 50, None, None, RED, display, image=path+"Images/settings.png")
 
     # Read the file containing controls
     try:
-        player_controls = pd.read_csv("../Names/Names.csv").to_dict()
+        player_controls = pd.read_csv(path+"Names/Names.csv").to_dict()
         if 'Unnamed: 0' in list(player_controls.keys()):
             player_controls.pop('Unnamed: 0')  # Remove the extra control column
     except pd.errors.EmptyDataError:  # If there is an error
@@ -68,7 +69,7 @@ def characterSelect():
 
         # Write the default to the file to avoid errors next time
         df = pd.DataFrame(player_controls)
-        df.to_csv("../Names/Names.csv")
+        df.to_csv(path+"Names/Names.csv")
 
     # Player 1 Box
     p1_select = player_select.playerSelect(1, (200, 450), RED, display)
@@ -87,7 +88,7 @@ def characterSelect():
     time = 3
     stocks = 3
 
-    musicObj = pygame.mixer.Sound("../Music/MenuViber.wav")
+    musicObj = pygame.mixer.Sound(path+"Music/MenuViber.wav")
     musicObj.play(-1)
 
     while True:

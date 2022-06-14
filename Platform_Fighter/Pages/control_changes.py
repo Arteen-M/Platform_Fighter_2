@@ -4,11 +4,12 @@
 import pygame
 from pygame.locals import *
 import sys
-from Version_2.GUI_Elements import control_select
-from Version_2.GUI_Elements import name_dropdown
-from Version_2.GUI_Elements import button
-from Version_2.GUI_Elements import text
-from Version_2.GUI_Elements.text import font
+from Platform_Fighter.GUI_Elements import control_select
+from Platform_Fighter.GUI_Elements import name_dropdown
+from Platform_Fighter.GUI_Elements import button
+from Platform_Fighter.GUI_Elements import text
+from Platform_Fighter.GUI_Elements.text import font
+from Platform_Fighter.path import path
 
 # -------------------------------------------------------------------------
 # Variable Definitions

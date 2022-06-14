@@ -24,7 +24,7 @@ GRAY = (125, 125, 125)
 FPS = 60
 FramePerSec = pygame.time.Clock()
 display = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Platform Fighter")
+pygame.display.set_caption("Platform_Fighter")
 
 
 # -------------------------------------------------------------------------

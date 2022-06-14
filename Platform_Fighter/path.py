@@ -1,0 +1,1 @@
+path = "../Platform_Fighter/"

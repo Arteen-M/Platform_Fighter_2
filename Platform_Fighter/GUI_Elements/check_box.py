@@ -1,5 +1,5 @@
 import pygame
-from Version_2.GUI_Elements import button
+from Platform_Fighter.GUI_Elements import button
 
 
 class checkBox:

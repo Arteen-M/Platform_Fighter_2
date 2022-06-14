@@ -1,9 +1,9 @@
 # -------------------------------------------------------------------------
-# Program: Platform Fighter 2
+# Program: Platform_Fighter 2
 # Author: Arteen Mirzaei
 # Date: 2022-06-07
 #
-# Platform Fighter is exactly what it sounds like, a platform fighter akin to Super Smash Bros,
+# Platform_Fighter is exactly what it sounds like, a platform fighter akin to Super Smash Bros,
 # where the objective is to knock your opponent off the screen (called a stage) and make them pass
 # the death barrier (called the blast zone). You achieve this by using a collection of attacking,
 # defending and movement options to dodge your opponent and attack them. Every time you or your
