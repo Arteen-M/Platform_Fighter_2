@@ -32,28 +32,28 @@ pygame.display.set_caption("Platform_Fighter")
 # -------------------------------------------------------------------------
 def Settings(time, stocks):
     # Header
-    header = text.Text("Settings", font, 56, WHITE, (WIDTH/2, 100), display)
+    header = text.Text("Settings", font, 56, WHITE, (WIDTH / 2, 100), display)
 
     # Times variables
     times_int = time  # Time (int)
     times_str = str(time) + ":00"  # Time (str)
-    timeHeader = text.Text("Time", font, 36, WHITE, (WIDTH/3, HEIGHT/2 - 100), display)  # Header
-    timeText = text.Text(times_str, font, 26, WHITE, (WIDTH/3, HEIGHT/2 - 50), display)  # Actual time text
+    timeHeader = text.Text("Time", font, 36, WHITE, (WIDTH / 3, HEIGHT / 2 - 100), display)  # Header
+    timeText = text.Text(times_str, font, 26, WHITE, (WIDTH / 3, HEIGHT / 2 - 50), display)  # Actual time text
 
     # Stocks variable
     stock = stocks  # Stocks (int)
-    stocksHeader = text.Text("Stocks", font, 36, WHITE, (2 * WIDTH / 3, HEIGHT/2 - 100), display)  # Header
-    stocksText = text.Text(str(stock), font, 26, WHITE, (2 * WIDTH / 3, HEIGHT/2 - 50), display)  # Actual Stock text
+    stocksHeader = text.Text("Stocks", font, 36, WHITE, (2 * WIDTH / 3, HEIGHT / 2 - 100), display)  # Header
+    stocksText = text.Text(str(stock), font, 26, WHITE, (2 * WIDTH / 3, HEIGHT / 2 - 50), display)  # Actual Stock text
 
     # Increase time button
-    timeUp = button.Button(WIDTH/3 + 38, HEIGHT/2 - 80, 25, 25, ((WIDTH/3 + 40, HEIGHT/2 - 60), (WIDTH/3 + 60, HEIGHT/2 - 60), (WIDTH/3 + 50, HEIGHT/2 - 80)), GRAY, RED, display, draw=True)
+    timeUp = button.Button(WIDTH / 3 + 38, HEIGHT / 2 - 80, 25, 25, ((WIDTH / 3 + 40, HEIGHT / 2 - 60), (WIDTH / 3 + 60, HEIGHT / 2 - 60), (WIDTH / 3 + 50, HEIGHT / 2 - 80)), GRAY, RED, display, draw=True)
     # Decrease time button
-    timeDown = button.Button(WIDTH/3 + 38, HEIGHT/2 - 42, 25, 25, ((WIDTH/3 + 40, HEIGHT/2 - 40), (WIDTH/3 + 60, HEIGHT/2 - 40), (WIDTH/3 + 50, HEIGHT/2 - 20)), GRAY, RED, display, draw=True)
+    timeDown = button.Button(WIDTH / 3 + 38, HEIGHT / 2 - 42, 25, 25, ((WIDTH / 3 + 40, HEIGHT / 2 - 40), (WIDTH / 3 + 60, HEIGHT / 2 - 40), (WIDTH / 3 + 50, HEIGHT / 2 - 20)), GRAY, RED, display, draw=True)
 
     # Increase stocks button
-    stockUp = button.Button(2*WIDTH/3 + 38, HEIGHT/2 - 80, 25, 25, ((2*WIDTH/3 + 40, HEIGHT/2 - 60), (2*WIDTH/3 + 60, HEIGHT/2 - 60), (2*WIDTH/3 + 50, HEIGHT/2 - 80)), GRAY, RED, display, draw=True)
+    stockUp = button.Button(2 * WIDTH / 3 + 38, HEIGHT / 2 - 80, 25, 25, ((2 * WIDTH / 3 + 40, HEIGHT / 2 - 60), (2 * WIDTH / 3 + 60, HEIGHT / 2 - 60), (2 * WIDTH / 3 + 50, HEIGHT / 2 - 80)), GRAY, RED, display, draw=True)
     # Decrease stocks button
-    stockDown = button.Button(2*WIDTH/3 + 38, HEIGHT/2 - 42, 25, 25, ((2*WIDTH/3 + 40, HEIGHT/2 - 40), (2*WIDTH/3 + 60, HEIGHT/2 - 40), (2*WIDTH/3 + 50, HEIGHT/2 - 20)), GRAY, RED, display, draw=True)
+    stockDown = button.Button(2 * WIDTH / 3 + 38, HEIGHT / 2 - 42, 25, 25, ((2 * WIDTH / 3 + 40, HEIGHT / 2 - 40), (2 * WIDTH / 3 + 60, HEIGHT / 2 - 40), (2 * WIDTH / 3 + 50, HEIGHT / 2 - 20)), GRAY, RED, display, draw=True)
 
     back_button = button.Button(50, 50, 150, 50, None, None, None, display)
     # The back button text

@@ -73,7 +73,7 @@ def characterSelect():
     p2_select = player_select.playerSelect(2, (600, 450), BLUE, display)
 
     # Instructions text
-    proceed = text.Text("Press Enter to Proceed", font, 20, WHITE, (WIDTH/2, HEIGHT - 20), display)
+    proceed = text.Text("Press Enter to Proceed", font, 20, WHITE, (WIDTH / 2, HEIGHT - 20), display)
     # Which player is choosing
     choose = text.Text("", font, 30, RED, (WIDTH / 2, 55), display)
 

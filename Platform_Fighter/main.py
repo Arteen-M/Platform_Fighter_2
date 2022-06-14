@@ -24,7 +24,7 @@ from Pages import welcome
 from Pages import character_select
 
 
-# --------------------------------------- ----------------------------------
+# --------------------------------------------------------------------------
 # Variable Definitions
 # -------------------------------------------------------------------------
 next_page = ""  # String to define where the program goes after returning from a page (Default Welcome)

@@ -29,7 +29,8 @@ class nameDrop:
         self.value_lists = list(self.names.values())
         # As many text items as there are names (in theory, an infinite amount)
         for count, name in enumerate(self.key_lists):
-            self.all_texts.append(text.Text(name, self.font, 36, WHITE, (pos[0] + 100, pos[1] + 25 + (50 * (count + 1))), display))
+            self.all_texts.append(
+                text.Text(name, self.font, 36, WHITE, (pos[0] + 100, pos[1] + 25 + (50 * (count + 1))), display))
 
         self.nameText = text.Text(self.name, self.font, 36, WHITE, (pos[0] + 100, pos[1]), display)
         self.pos = pos

@@ -30,9 +30,9 @@ pygame.display.set_caption("Platform_Fighter")
 # -------------------------------------------------------------------------
 def Pause():
     # Texts for instructions
-    pauseText = text.Text("Pause", font, 64, WHITE, (WIDTH/2, HEIGHT/2 - 50), display)
-    resumeText = text.Text("Press Enter to Resume", font, 32, WHITE, (WIDTH/2, HEIGHT/2 + 50), display)
-    escapeText = text.Text("Press Escape to Exit", font, 26, WHITE, (WIDTH/2, HEIGHT/2+85), display)
+    pauseText = text.Text("Pause", font, 64, WHITE, (WIDTH / 2, HEIGHT / 2 - 50), display)
+    resumeText = text.Text("Press Enter to Resume", font, 32, WHITE, (WIDTH / 2, HEIGHT / 2 + 50), display)
+    escapeText = text.Text("Press Escape to Exit", font, 26, WHITE, (WIDTH / 2, HEIGHT / 2 + 85), display)
 
     # Draw Everything (Just once)
     display.fill(BLACK)
