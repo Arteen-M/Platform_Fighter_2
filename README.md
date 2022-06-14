@@ -1,4 +1,4 @@
-# Platform_Fighter_2
+# Platform Fighter 2
 
 File Archetecture:
 - Notes
