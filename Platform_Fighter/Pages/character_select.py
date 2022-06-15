@@ -89,6 +89,7 @@ def characterSelect():
     stocks = 3
 
     musicObj = pygame.mixer.Sound(path+"Music/MenuViber.wav")
+    musicObj.set_volume(0.5)
     musicObj.play(-1)
 
     while True:
