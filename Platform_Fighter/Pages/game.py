@@ -180,6 +180,6 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
         FramePerSec.tick(FPS)  # CAP AT 60 FPS
 
     musicObj.stop()
-    time.sleep(2)  # Delay to allow everyone to process
+    time.sleep(2)  # Delay, to allow everyone to process
 
 # gameLoop()

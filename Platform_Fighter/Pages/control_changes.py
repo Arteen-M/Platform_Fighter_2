@@ -9,7 +9,6 @@ from Platform_Fighter.GUI_Elements import name_dropdown
 from Platform_Fighter.GUI_Elements import button
 from Platform_Fighter.GUI_Elements import text
 from Platform_Fighter.GUI_Elements.text import font
-from Platform_Fighter.path import path
 
 # -------------------------------------------------------------------------
 # Variable Definitions
