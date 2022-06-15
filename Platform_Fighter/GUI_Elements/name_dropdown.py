@@ -3,6 +3,7 @@ import pandas as pd
 from Platform_Fighter.GUI_Elements import button
 from Platform_Fighter.GUI_Elements import text
 from Platform_Fighter.GUI_Elements.text import font
+from Platform_Fighter.path import path
 
 WIDTH = 800
 HEIGHT = 600
@@ -16,7 +17,7 @@ RED = (255, 0, 0)
 class nameDrop:
     def __init__(self, pos, display):
         self.font = font
-        self.names = pd.read_csv("../Names/Names.csv").to_dict()
+        self.names = pd.read_csv(path+"Names/Names.csv").to_dict()
         if 'Unnamed: 0' in list(self.names.keys()):
             self.names.pop('Unnamed: 0')
 
@@ -86,4 +87,4 @@ class nameDrop:
     def saveControls(self, controls):
         self.names[self.name] = {0: controls[0], 1: controls[1], 2: controls[2], 3: controls[3], 4: controls[4]}
         df = pd.DataFrame(self.names)
-        df.to_csv("../Names/Names.csv")
+        df.to_csv(path+"Names/Names.csv")
