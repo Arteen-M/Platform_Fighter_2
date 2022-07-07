@@ -51,7 +51,9 @@ def characterSelect():
     P1_choosing = True
 
     # Button for choosing the square
-    square_select = char_select.charButton((400, 200), "Square", display, RED)
+    square_select = char_select.charButton((300, 200), "Square", display, RED)
+    # Button for choosing the Stickman
+    stickman_select = char_select.charButton((500, 200), "Stickman", display, RED, path+"Images/Stickman/stick_stock_graphic.png", (300, 300))
     # Button for moving to the control menu
     controls = button.Button(50, 50, 50, 50, None, None, RED, display, image=path+"Images/Controls.png")
     # Button for moving to the settings menu
@@ -121,6 +123,7 @@ def characterSelect():
                 p1_select.get_pressed(True)
                 p2_select.get_pressed(True)
                 square_select.get_pressed(True)
+                stickman_select.get_pressed(True)
                 controls.get_pressed(True)
                 settings.get_pressed(True)
                 debugBox.get_pressed(True)
@@ -129,6 +132,7 @@ def characterSelect():
                 p1_select.get_pressed(False)
                 p2_select.get_pressed(False)
                 square_select.get_pressed(False)
+                stickman_select.get_pressed(False)
                 controls.get_pressed(False)
                 settings.get_pressed(False)
                 debugBox.get_pressed(False)
@@ -141,6 +145,7 @@ def characterSelect():
         # Update (Draw) the buttons
         controls.update()
         square_select.update()
+        stickman_select.update()
         settings.update()
 
         debug.draw()
@@ -171,6 +176,9 @@ def characterSelect():
         square_skins_1 = [RED, BLUE, GREEN, YELLOW]
         square_skins_2 = [RED, BLUE, GREEN, YELLOW]
 
+        stick_skins_1 = [RED, RED]
+        stick_skins_2 = [RED, RED]
+
         # Change the available skins list based on the opponents skin choice
         if current_skins[1] in square_skins_1:
             square_skins_1[square_skins_1.index(current_skins[1])] = None
@@ -190,6 +198,18 @@ def characterSelect():
 
             # The button is not pressed
             square_select.button.pressed = False
+
+        if stickman_select.button.pressed:
+            if P1_choosing:
+                characters[0] = "Stickman"
+                skins[0] = stick_skins_1
+                P1_choosing = False
+            else:
+                characters[1] = "Stickman"
+                skins[1] = stick_skins_2
+                P1_choosing = True
+
+            stickman_select.button.pressed = False
 
         # Sets skins
         if characters[0] == "Square":

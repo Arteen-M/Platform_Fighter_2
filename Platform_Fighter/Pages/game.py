@@ -6,6 +6,7 @@ from pygame.locals import *
 import sys
 import time
 from Platform_Fighter.Characters import square
+from Platform_Fighter.Characters import stickman
 from Platform_Fighter.Stage_Elements import floor
 from Platform_Fighter.Stage_Elements import wall
 from Platform_Fighter.Characters.Character_Elements import graphic
@@ -26,6 +27,7 @@ pygame.mixer.set_num_channels(3)
 WIDTH = 800
 HEIGHT = 600
 RED = (255, 0, 0)
+BLUE = (0, 0, 255)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
@@ -50,6 +52,9 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
         # Create a square character
         P1 = square.Square(display, color=skins[0], spawn_position=((WIDTH / 2) - 100, HEIGHT / 2), controls=list(controls["Player 1"].values()), stocks=stocks)
         P1_Graphic = graphic.Graphic(display, font, 36, (275, 500), skins[0], stocks=stocks)
+    elif characters[0] == "Stickman":
+        P1 = stickman.Stickman(display, color=RED, spawn_position=((WIDTH / 2) - 100, HEIGHT / 2), controls=list(controls["Player 1"].values()), stocks=stocks)
+        P1_Graphic = graphic.Graphic(display, font, 36, (275, 500), RED, stocks=stocks, img=path+"Images/Stickman/stick_stock_graphic.png", scale=(80, 80))
     else:
         raise Exception("No Character Selected. How did you do that?")
 
@@ -57,6 +62,9 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
         # Create a square character
         P2 = square.Square(display, color=skins[1], spawn_position=((WIDTH / 2) + 100, HEIGHT / 2), controls=list(controls["Player 2"].values()), stocks=stocks)
         P2_Graphic = graphic.Graphic(display, font, 36, (525, 500), skins[1], stocks=stocks)
+    elif characters[1] == "Stickman":
+        P2 = stickman.Stickman(display, color=BLUE, spawn_position=((WIDTH / 2) + 100, HEIGHT / 2), controls=list(controls["Player 2"].values()), stocks=stocks)
+        P2_Graphic = graphic.Graphic(display, font, 36, (525, 500), BLUE, stocks=stocks, img=path + "Images/Stickman/stick_stock_graphic.png", scale=(80, 80))
     else:
         raise Exception("No Character Selected. How did you do that?")
 

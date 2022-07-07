@@ -10,7 +10,7 @@ from Platform_Fighter.GUI_Elements import text
 # Class Definition
 # -------------------------------------------------------------------------
 class Graphic:
-    def __init__(self, display, font, size, pos, color, stocks=3, img=None):
+    def __init__(self, display, font, size, pos, color, stocks=3, img=None, scale=None):
         # Percentage Text
         self.text = "0%"
         self.font = font
@@ -19,7 +19,11 @@ class Graphic:
         self.display = display
         self.total_stocks = stocks  # Total stocks and stocks are independent
         self.stocks = 0
-        self.image = img  # if the stock graphic is an image rather than a square
+        if img is not None:
+            # if the stock graphic is an image rather than a square
+            self.image = pygame.transform.scale(pygame.image.load(img), scale).convert_alpha()
+        else:
+            self.image = None
 
         # Text for the percentage
         self.textGraphic = text.Text(self.text, self.font, size, self.color, self.pos, self.display)
@@ -41,5 +45,9 @@ class Graphic:
             for num in range(self.stocks):
                 pygame.draw.rect(self.display, self.color,
                                  (self.pos[0] - 25 + (15 * (num % 3)), self.pos[1] + 20 + (15 * (num // 3)), 10, 10))
+        else:
+            for num in range(self.stocks):
+                self.display.blit(self.image, self.image.get_rect(center=(self.pos[0] - 30 + (26 * (num % 3)), self.pos[1] + 26 + (15 * (num // 3)))))
+
             # for num in range(self.stocks): pygame.draw.rect(self.display, self.color, (self.pos[0] + self.side,
             # self.pos[1] - 55 + (40 * num), 30, 30))

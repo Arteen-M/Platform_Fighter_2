@@ -18,7 +18,7 @@ WHITE = (255, 255, 255)
 # Class Definition
 # -------------------------------------------------------------------------
 class charButton(pygame.sprite.Sprite):
-    def __init__(self, pos, name, display, color, image=None):
+    def __init__(self, pos, name, display, color, image=None, scale=None):
         super().__init__()
         self.surf = pygame.Surface((75 * 2, 75 * 2))
         self.pos = pos
@@ -37,7 +37,10 @@ class charButton(pygame.sprite.Sprite):
             self.image = pygame.Surface((85, 85))
             self.image.fill(self.color)
         else:
-            self.image = image
+            self.image = pygame.image.load(image).convert_alpha()
+
+        if scale is not None:
+            self.image = pygame.transform.scale(self.image, scale)
 
         self.image_rect = self.image.get_rect(center=(self.pos[0], self.pos[1] + 15))
 

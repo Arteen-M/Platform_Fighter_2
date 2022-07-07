@@ -5,6 +5,7 @@ import pygame
 from Platform_Fighter.GUI_Elements import button
 from Platform_Fighter.GUI_Elements import text
 from Platform_Fighter.GUI_Elements.text import font
+from Platform_Fighter.path import path
 
 # -------------------------------------------------------------------------
 # Variable Definitions
@@ -83,6 +84,10 @@ class playerSelect(pygame.sprite.Sprite):
         if character == "Square":
             self.characterSurf = pygame.Surface((100, 100))
             self.characterSurf.fill(self.skin)
+            self.characterRect = self.characterSurf.get_rect(center=(self.pos[0] - 100, self.pos[1]))
+            self.display.blit(self.characterSurf, self.characterRect)
+        if character == "Stickman":
+            self.characterSurf = pygame.transform.scale(pygame.image.load(path+"Images/Stickman/stick_stock_graphic.png"), (400, 400))
             self.characterRect = self.characterSurf.get_rect(center=(self.pos[0] - 100, self.pos[1]))
             self.display.blit(self.characterSurf, self.characterRect)
 
