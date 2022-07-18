@@ -189,8 +189,19 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 self.walk_cycle_left = len(self.walk_frames_left) - 1
 
     def idleCycle(self):
-        if self.on_ground and not (self.walk_cycle_right or self.walk_cycle_left) and self.vel.y == 0:
-            pass
+        if self.on_ground and not (self.walk_cycle_right or self.walk_cycle_left):
+            if self.direction:
+                self.idle_cycle_left = 0
+                if self.idle_cycle_right == 0:
+                    self.idle_cycle_right = len(self.idle_frames_right) - 1
+                else:
+                    self.idle_cycle_right -= 1
+            else:
+                self.idle_cycle_right = 0
+                if self.idle_cycle_left == 0:
+                    self.idle_cycle_left = len(self.idle_frames_left) - 1
+                else:
+                    self.idle_cycle_left -= 1
 
     # The formula for knockback (I stole this from SmashWiki)
     def knockbackFormula(self, angle, damage, scale, base, mod):
@@ -346,13 +357,15 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             elif self.walk_cycle_left > 0:
                 self.image = self.walk_frames_left[self.walk_cycle_left]
         else:
-            pass  # (Idle cycle)
+            self.idleCycle()
+            if self.idle_cycle_right > 0:
+                self.image = self.idle_frames_right[self.idle_cycle_right]
+            elif self.idle_cycle_left > 0:
+                self.image = self.idle_frames_left[self.idle_cycle_left]
 
     # Horizontal Movements
     def move(self, walls):
         # Acceleration needs to be reset every frame
-        if self.walk_cycle_right > 0 or self.walk_cycle_left > 0:
-            print(self.walk_cycle_right, self.walk_cycle_left)
         self.acc.x = 0
 
         # If you aren't in lag
