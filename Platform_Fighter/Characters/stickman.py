@@ -213,7 +213,6 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                     self.idle_cycle_left -= 1
 
     def nairCycleSet(self):
-        self.image_rect.midbottom = (self.pos.x + self.nair_image_skew[0], self.pos.y + self.nair_image_skew[1])
         if self.direction:
             if self.nair_cycle_right == 0:
                 self.nair_cycle_right = len(self.nair_frames_right) - 1
@@ -222,7 +221,6 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 self.nair_cycle_left = len(self.nair_frames_left) - 1
 
     def countNairCycle(self):
-        self.image_rect.midbottom = (self.pos.x + self.nair_image_skew[0], self.pos.y + self.nair_image_skew[1])
         if self.direction:
             if self.nair_cycle_right > 0:
                 self.nair_cycle_right -= 1
@@ -398,6 +396,8 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             elif self.idle_cycle_left > 0:
                 self.image = self.idle_frames_left[self.idle_cycle_left]
 
+        self.image_rect.midbottom = (self.pos.x + self.image_skew[0], self.pos.y + self.image_skew[1])
+
     # Horizontal Movements
     def move(self, walls):
         # Acceleration needs to be reset every frame
@@ -517,7 +517,6 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         # Update position
         self.pos += self.vel
         self.rect.midbottom = self.pos
-        self.image_rect.midbottom = (self.pos.x + self.image_skew[0], self.pos.y + self.image_skew[1])
 
     # when you jump
     def jump(self):
@@ -572,13 +571,13 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             if not (pressed_keys[self.right] or pressed_keys[self.left] or pressed_keys[self.up] or pressed_keys[self.down]):
                 self.nairCycleSet()
                 # Update the hitbox position
-                self.n_attack.update((self.pos.x, self.pos.y - 15))
+                self.n_attack.update((self.pos.x, self.pos.y - 25))
                 # Set your attack lag
                 self.lag = self.n_attack.lag
         # If the hitbox is already running
         elif self.n_attack.running:
             # Update the hitbox position
-            self.n_attack.update((self.pos.x, self.pos.y - 15))
+            self.n_attack.update((self.pos.x, self.pos.y - 25))
 
     # Forward attack
     def forwardAttack(self):
@@ -723,9 +722,6 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 self.move(walls)
                 self.jump()
 
-        # ACC, VEL AND POS UPDATE (ALWAYS)
-        self.physicsUpdate()
-
         if not self.frozen:
             if not self.hitstun:
                 # ATTACKS (CONDITIONAL)
@@ -740,6 +736,10 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             # GETTING HIT (CONDITIONAL)
             if not self.invincibility:  # invincibility just means you can't get hit
                 self.getHit(opponent_hitboxes)
+
+        # ACC, VEL AND POS UPDATE (ALWAYS)
+        self.physicsUpdate()
+
         # ANIMATING (ALWAYS)
         self.drawHitbox()
         self.imageUpdate()
