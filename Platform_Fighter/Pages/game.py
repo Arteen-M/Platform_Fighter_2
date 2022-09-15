@@ -149,9 +149,11 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
 
         if P1.got_hit:
             P2HitMusic.play()
+            P2.hitconfirm = P1.hitstop
 
         if P2.got_hit:
             P1HitMusic.play()
+            P1.hitconfirm = P2.hitstop
 
         # Update the graphic with information
         P1_Graphic.update(P1.percentage, P1.stocks)

@@ -98,6 +98,8 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.frozen = 0  # If the character can't move (with no influence) (usually on respawn)
         self.lag = 0  # Attack lag
         self.hitstun = 0  # Hitstun (after being hit by an opponent)
+        self.hitstop = 0
+        self.hitconfirm = 0
         self.momentum = 0  # Momentum (after you gain control from hitstun, but your momentum sticks around)
         self.knockback = vec(0, 0)  # Knockback Vector (x and y)
         self.got_hit = False
@@ -114,24 +116,44 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.walk_frames_left = [pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Walk Cycle/Walk_%d.png" % x), True, False).convert_alpha() for x in range(1, 17)]
         self.walk_cycle_left = 0
 
+        self.f_tilt_frames_right = [pygame.image.load(path+"Images/Stickman/Forward Tilt/stick_char_ftilt-%d.png" % (15 - x // 2)).convert_alpha() for x in range(2, 29)]
+        self.f_tilt_cycle_right = 0
+
+        self.f_tilt_frames_left = [pygame.transform.flip(pygame.image.load(path + "Images/Stickman/Forward Tilt/stick_char_ftilt-%d.png" % (15 - x // 2)), True, False).convert_alpha() for x in range(2, 29)]
+        self.f_tilt_cycle_left = 0
+
         self.nair_frames_right = [pygame.image.load(path+"Images/Stickman/Neutral Air/Nair_%d.png" % x).convert_alpha() for x in range(0, 28)]
         self.nair_cycle_right = 0
 
         self.nair_frames_left = [pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Neutral Air/Nair_%d.png" % x), True, False).convert_alpha() for x in range(0, 28)]
         self.nair_cycle_left = 0
 
+        self.fair_frames_right = [pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Forward Air/stick_char_fair-%d.png" % x), True, False).convert_alpha() for x in range(1, 19)]
+        self.fair_cycle_right = 0
+
+        self.fair_frames_left = [pygame.image.load(path+"Images/Stickman/Forward Air/stick_char_fair-%d.png" % x).convert_alpha() for x in range(1, 19)]
+        self.fair_cycle_left = 0
+
+        self.air_image_right = pygame.image.load(path+"Images/Stickman/Walk Cycle/Walk_16.png").convert_alpha()
+        self.air_image_left = pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Walk Cycle/Walk_16.png"), True, False).convert_alpha()
+
+        #print(len(self.nair_frames_left))
+
         self.nair_image_skew = (0, 25)
+        self.fair_image_skew = (0, 15)
+        self.f_tilt_image_skew = (0, 0)
 
         # Hitboxes for each usable attack
         #                                name      size       display   lag  sf  ef dir  angle    dmg b  s  hitstun  color
-        self.n_attack = hitbox.HitBox("Neutral", (60, 60), self.display, 20, 15, 5, 1, (0.5, 0.5), 5, 1, 0.2, 5, self.color)
-        self.f_attack = hitbox.HitBox("Forward", (20, 20), self.display, 20, 15, 5, 1, (0.6, 0.4), 7, 1.5, 0.2, 3, self.color)
+        self.n_attack = hitbox.HitBox("Neutral", (60, 60), self.display, 28, 24, 2, 1, (0.5, 0.5), 5, 1, 0.2, 5, self.color)
+        self.f_tilt_attack = hitbox.HitBox("Forward", (40, 20), self.display, 28, 14, 8, 1, (0.6, 0.4), 7, 1.5, 0.2, 3, self.color)
+        self.f_air_attack = hitbox.HitBox("Forward", (60, 30), self.display, 28, 24, 18, 1, (0.6, 0.4), 7, 1.5, 0.2, 3, self.color)
         self.b_attack = hitbox.HitBox("Back", (40, 15), self.display, 20, 15, 5, 1, (-0.65, 0.35), 8, 1, 0.2, 3, self.color)
         self.u_attack = hitbox.HitBox("Up", (40, 30), self.display, 20, 15, 5, 1, (0.15, 0.7), 4, 1.2, 0.3, 5, self.color)
         self.d_attack = hitbox.HitBox("Down", (50, 30), self.display, 20, 15, 5, 1, (0.05, -0.6), 10, 1.5, 0.3, 5, self.color)
 
-        # Hitbox groupss
-        self.all_hitboxes = [self.n_attack, self.f_attack, self.b_attack, self.u_attack, self.d_attack]
+        # Hitbox groups
+        self.all_hitboxes = [self.n_attack, self.f_tilt_attack, self.f_air_attack, self.b_attack, self.u_attack, self.d_attack]
         self.active_hitboxes = pygame.sprite.Group()
 
         self.image_skew = (0, 0)
@@ -143,6 +165,13 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
     def draw(self):
         self.display.blit(self.surf, self.rect)
         self.display.blit(self.image, self.image_rect)
+
+    def countHitstop(self):
+        if self.hitstop > 0 or self.hitconfirm > 0:
+            if self.hitstop > 0:
+                self.hitstop -= 1
+            if self.hitconfirm > 0:
+                self.hitconfirm -= 1
 
     # Reduce the attack lag by 1
     def countLag(self):
@@ -212,6 +241,22 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 else:
                     self.idle_cycle_left -= 1
 
+    def ftiltCycleSet(self):
+        if self.direction:
+            if self.f_tilt_cycle_right == 0:
+                self.f_tilt_cycle_right = len(self.f_tilt_frames_right) - 1
+        else:
+            if self.f_tilt_cycle_left == 0:
+                self.f_tilt_cycle_left = len(self.f_tilt_frames_left) - 1
+
+    def countFtiltCycle(self):
+        if self.direction:
+            if self.f_tilt_cycle_right > 0:
+                self.f_tilt_cycle_right -= 1
+        else:
+            if self.f_tilt_cycle_left > 0:
+                self.f_tilt_cycle_left -= 1
+
     def nairCycleSet(self):
         if self.direction:
             if self.nair_cycle_right == 0:
@@ -227,6 +272,22 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         else:
             if self.nair_cycle_left > 0:
                 self.nair_cycle_left -= 1
+
+    def fairCycleSet(self):
+        if self.direction:
+            if self.fair_cycle_right == 0:
+                self.fair_cycle_right = len(self.fair_frames_right) - 1
+        else:
+            if self.fair_cycle_left == 0:
+                self.fair_cycle_left = len(self.fair_frames_left) - 1
+
+    def countFairCycle(self):
+        if self.direction:
+            if self.fair_cycle_right > 0:
+                self.fair_cycle_right -= 1
+        else:
+            if self.fair_cycle_left > 0:
+                self.fair_cycle_left -= 1
 
     # The formula for knockback (I stole this from SmashWiki)
     def knockbackFormula(self, angle, damage, scale, base, mod):
@@ -334,6 +395,12 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 # Cancel lag and momentum
                 self.lag = 0
                 self.momentum = 0
+                self.f_tilt_cycle_right = 0
+                self.f_tilt_cycle_left = 0
+                self.nair_cycle_right = 0
+                self.nair_cycle_left = 0
+                self.fair_cycle_right = 0
+                self.fair_cycle_left = 0
                 self.going_down = False
                 # Reset any hitboxes
                 for hitbox in self.all_hitboxes:
@@ -382,12 +449,30 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 self.image = self.nair_frames_right[self.nair_cycle_right]
             elif self.nair_cycle_left > 0:
                 self.image = self.nair_frames_left[self.nair_cycle_left]
+        elif self.fair_cycle_right > 0 or self.fair_cycle_left > 0:
+            self.image_skew = self.fair_image_skew
+            if self.fair_cycle_right > 0:
+                self.image = self.fair_frames_right[self.fair_cycle_right]
+            elif self.fair_cycle_left > 0:
+                self.image = self.fair_frames_left[self.fair_cycle_left]
+        elif self.f_tilt_cycle_right > 0 or self.f_tilt_cycle_left > 0:
+            self.image_skew = self.f_tilt_image_skew
+            if self.f_tilt_cycle_right > 0:
+                self.image = self.f_tilt_frames_right[self.f_tilt_cycle_right]
+            elif self.f_tilt_cycle_left > 0:
+                self.image =  self.f_tilt_frames_left[self.f_tilt_cycle_left]
         elif self.walk_cycle_right > 0 or self.walk_cycle_left > 0:
             self.image_skew = (0, 0)
             if self.walk_cycle_right > 0:
                 self.image = self.walk_frames_right[self.walk_cycle_right]
             elif self.walk_cycle_left > 0:
                 self.image = self.walk_frames_left[self.walk_cycle_left]
+        elif not self.on_ground:
+            self.image_skew = (0, 0)
+            if self.direction:
+                self.image = self.air_image_right
+            else:
+                self.image = self.air_image_left
         else:
             self.image_skew = (0, 0)
             self.idleCycleSet()
@@ -586,23 +671,45 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         # If you're attacking, and you're not in attack lag
         if pressed_keys[self.attack] and self.lag <= 0:
             # If the pressed direction corresponds to the character direction
-            if pressed_keys[self.right] and self.direction:
-                # Update your lag and attack hitbox
-                self.f_attack.update((self.pos.x + 30, self.pos.y - 15))
-                self.lag = self.f_attack.lag
+            if self.on_ground:
+                if pressed_keys[self.right] and self.direction:
+                    self.ftiltCycleSet()
+                    # Update your lag and attack hitbox
+                    self.f_tilt_attack.update((self.pos.x + 20, self.pos.y - 25))
+                    self.lag = self.f_tilt_attack.lag
 
-            # Same condition, but with the other side
-            if pressed_keys[self.left] and not self.direction:
-                # Update your lag and attack hitbox
-                self.f_attack.update((self.pos.x - 30, self.pos.y - 15))
-                self.lag = self.f_attack.lag
+                # Same condition, but with the other side
+                if pressed_keys[self.left] and not self.direction:
+                    self.ftiltCycleSet()
+                    # Update your lag and attack hitbox
+                    self.f_tilt_attack.update((self.pos.x - 20, self.pos.y - 25))
+                    self.lag = self.f_tilt_attack.lag
+            else:
+                if pressed_keys[self.right] and self.direction:
+                    self.fairCycleSet()
+                    # Update your lag and attack hitbox
+                    self.f_air_attack.update((self.pos.x + 20, self.pos.y - 35))
+                    self.lag = self.f_air_attack.lag
+
+                # Same condition, but with the other side
+                if pressed_keys[self.left] and not self.direction:
+                    self.fairCycleSet()
+                    # Update your lag and attack hitbox
+                    self.f_air_attack.update((self.pos.x - 20, self.pos.y - 35))
+                    self.lag = self.f_air_attack.lag
         # If the hitbox is already running
-        elif self.f_attack.running:
+        elif self.f_tilt_attack.running:
             # Update the hitbox based on where it should go
             if self.direction:
-                self.f_attack.update((self.pos.x + 30, self.pos.y - 15))
+                self.f_tilt_attack.update((self.pos.x + 20, self.pos.y - 25))
             else:
-                self.f_attack.update((self.pos.x - 30, self.pos.y - 15))
+                self.f_tilt_attack.update((self.pos.x - 20, self.pos.y - 25))
+        elif self.f_air_attack.running:
+            # Update the hitbox based on where it should go
+            if self.direction:
+                self.f_air_attack.update((self.pos.x + 20, self.pos.y - 35))
+            else:
+                self.f_air_attack.update((self.pos.x - 20, self.pos.y - 35))
 
     # Back attack
     def backAttack(self):
@@ -680,6 +787,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             velocity = math.sqrt((self.knockback.x ** 2) + (self.knockback.y ** 2))
             # Set their hitstun and momentum based on the power of the attack
             self.hitstun = math.floor(self.hitstunFormula(velocity, box.hitstun, box.damage))
+            self.hitstop = self.findHitstop(box.damage, 0.5)
             self.momentum = math.floor(self.hitstun * math.ceil(box.hitstun) + 1)
         else:
             self.got_hit = False
@@ -689,17 +797,21 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         # RESPAWN/END FUNCTIONS (ALWAYS)
         self.respawn()
         self.endGame()
-        # COUNTING FUNCTIONS (ALWAYS)
-        self.countLag()
-        self.countHitstun()
-        self.countMomentum()
+        # COUNTING FUNCTIONS (ALMOST ALWAYS)
+        self.countHitstop()
         self.countInvincibility()
         self.countFrozen()
-        self.countPressedDown()
-        self.countPressedLeft()
-        self.countPressedRight()
-        self.countWalkCycle()
-        self.countNairCycle()
+        if not self.hitstop and not self.hitconfirm:
+            self.countLag()
+            self.countHitstun()
+            self.countMomentum()
+            self.countPressedDown()
+            self.countPressedLeft()
+            self.countPressedRight()
+            self.countWalkCycle()
+            self.countNairCycle()
+            self.countFairCycle()
+            self.countFtiltCycle()
 
         # CONDITIONAL MOVEMENT (CONDITIONAL)
         if not (self.frozen or self.lag or self.hitstun):
@@ -737,8 +849,9 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             if not self.invincibility:  # invincibility just means you can't get hit
                 self.getHit(opponent_hitboxes)
 
-        # ACC, VEL AND POS UPDATE (ALWAYS)
-        self.physicsUpdate()
+        # ACC, VEL AND POS UPDATE (ALMOST ALWAYS)
+        if self.hitstop <= 0 and self.hitconfirm <= 0:
+            self.physicsUpdate()
 
         # ANIMATING (ALWAYS)
         self.drawHitbox()
