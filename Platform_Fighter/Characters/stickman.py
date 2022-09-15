@@ -134,13 +134,18 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.fair_frames_left = [pygame.image.load(path+"Images/Stickman/Forward Air/stick_char_fair-%d.png" % x).convert_alpha() for x in range(1, 19)]
         self.fair_cycle_left = 0
 
+        self.up_air_frames_right = [pygame.image.load(path+"Images/Stickman/Up Air/stick_char_upair-%d.png" % (9 - x // 2)).convert_alpha() for x in range(2, 18)]
+        self.up_air_cycle_right = 0
+
+        self.up_air_frames_left = [pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Up Air/stick_char_upair-%d.png" % (9 - x // 2)), True, False).convert_alpha() for x in range(2, 18)]
+        self.up_air_cycle_left = 0
+
         self.air_image_right = pygame.image.load(path+"Images/Stickman/Walk Cycle/Walk_16.png").convert_alpha()
         self.air_image_left = pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Walk Cycle/Walk_16.png"), True, False).convert_alpha()
 
-        #print(len(self.nair_frames_left))
-
         self.nair_image_skew = (0, 25)
         self.fair_image_skew = (0, 15)
+        self.up_air_image_skew = (0, 0)
         self.f_tilt_image_skew = (0, 0)
 
         # Hitboxes for each usable attack
@@ -149,11 +154,11 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.f_tilt_attack = hitbox.HitBox("Forward", (40, 20), self.display, 28, 14, 8, 1, (0.6, 0.4), 7, 1.5, 0.2, 3, self.color)
         self.f_air_attack = hitbox.HitBox("Forward", (60, 30), self.display, 28, 24, 18, 1, (0.6, 0.4), 7, 1.5, 0.2, 3, self.color)
         self.b_attack = hitbox.HitBox("Back", (40, 15), self.display, 20, 15, 5, 1, (-0.65, 0.35), 8, 1, 0.2, 3, self.color)
-        self.u_attack = hitbox.HitBox("Up", (40, 30), self.display, 20, 15, 5, 1, (0.15, 0.7), 4, 1.2, 0.3, 5, self.color)
+        self.u_air_attack = hitbox.HitBox("Up", (40, 40), self.display, 16, 10, 5, 1, (0.15, 0.7), 4, 1.2, 0.3, 5, self.color)
         self.d_attack = hitbox.HitBox("Down", (50, 30), self.display, 20, 15, 5, 1, (0.05, -0.6), 10, 1.5, 0.3, 5, self.color)
 
         # Hitbox groups
-        self.all_hitboxes = [self.n_attack, self.f_tilt_attack, self.f_air_attack, self.b_attack, self.u_attack, self.d_attack]
+        self.all_hitboxes = [self.n_attack, self.f_tilt_attack, self.f_air_attack, self.b_attack, self.u_air_attack, self.d_attack]
         self.active_hitboxes = pygame.sprite.Group()
 
         self.image_skew = (0, 0)
@@ -272,6 +277,22 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         else:
             if self.nair_cycle_left > 0:
                 self.nair_cycle_left -= 1
+
+    def uairCycleSet(self):
+        if self.direction:
+            if self.up_air_cycle_right == 0:
+                self.up_air_cycle_right = len(self.up_air_frames_right) - 1
+        else:
+            if self.up_air_cycle_left == 0:
+                self.up_air_cycle_left = len(self.up_air_frames_left) - 1
+
+    def countUairCycle(self):
+        if self.direction:
+            if self.up_air_cycle_right > 0:
+                self.up_air_cycle_right -= 1
+        else:
+            if self.up_air_cycle_left > 0:
+                self.up_air_cycle_left -= 1
 
     def fairCycleSet(self):
         if self.direction:
@@ -395,12 +416,16 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 # Cancel lag and momentum
                 self.lag = 0
                 self.momentum = 0
+
                 self.f_tilt_cycle_right = 0
                 self.f_tilt_cycle_left = 0
                 self.nair_cycle_right = 0
                 self.nair_cycle_left = 0
                 self.fair_cycle_right = 0
                 self.fair_cycle_left = 0
+                self.up_air_cycle_right = 0
+                self.up_air_cycle_left = 0
+
                 self.going_down = False
                 # Reset any hitboxes
                 for hitbox in self.all_hitboxes:
@@ -449,6 +474,12 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 self.image = self.nair_frames_right[self.nair_cycle_right]
             elif self.nair_cycle_left > 0:
                 self.image = self.nair_frames_left[self.nair_cycle_left]
+        elif self.up_air_cycle_right > 0 or self.up_air_cycle_left > 0:
+            self.image_skew = self.up_air_image_skew
+            if self.up_air_cycle_right > 0:
+                self.image = self.up_air_frames_right[self.up_air_cycle_right]
+            elif self.up_air_cycle_left > 0:
+                self.image = self.up_air_frames_left[self.up_air_cycle_left]
         elif self.fair_cycle_right > 0 or self.fair_cycle_left > 0:
             self.image_skew = self.fair_image_skew
             if self.fair_cycle_right > 0:
@@ -734,15 +765,18 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
     # Up attack
     def upAttack(self):
         pressed_keys = pygame.key.get_pressed()
-
         # If you're attacking, and you're not in attack lag
         if pressed_keys[self.attack] and self.lag <= 0:
-            # If you're pressing up
-            if pressed_keys[self.up]:
-                self.u_attack.update((self.pos.x, self.pos.y - 30))
-                self.lag = self.u_attack.lag
-        elif self.u_attack.running:
-            self.u_attack.update((self.pos.x, self.pos.y - 30))
+            if self.on_ground:
+                pass
+            else:
+                self.uairCycleSet()
+                # If you're pressing up
+                if pressed_keys[self.up]:
+                    self.u_air_attack.update((self.pos.x, self.pos.y - 40))
+                    self.lag = self.u_air_attack.lag
+        elif self.u_air_attack.running:
+            self.u_air_attack.update((self.pos.x, self.pos.y - 40))
 
     # Down attack
     def downAttack(self):
@@ -810,6 +844,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             self.countPressedRight()
             self.countWalkCycle()
             self.countNairCycle()
+            self.countUairCycle()
             self.countFairCycle()
             self.countFtiltCycle()
 
