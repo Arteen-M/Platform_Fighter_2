@@ -90,9 +90,9 @@ def characterSelect():
     time = 3
     stocks = 3
 
-    musicObj = pygame.mixer.Sound(path+"Music/MenuViber.wav")
-    musicObj.set_volume(0.5)
-    musicObj.play(-1)
+    #musicObj = pygame.mixer.Sound(path+"Music/MenuViber.wav")
+    #musicObj.set_volume(0.5)
+    #musicObj.play(-1)
 
     while True:
         # Whoever is choosing, display the appropriate text
@@ -114,7 +114,7 @@ def characterSelect():
                 if event.key == K_RETURN:
                     if characters[0] != "" and characters[1] != "":
                         # Return everything required
-                        musicObj.stop()
+                        #musicObj.stop()
                         return "Game", characters, current_skins, player_controls, time, stocks, debugBox.pressed
 
             # If you click down

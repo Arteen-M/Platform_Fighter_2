@@ -23,7 +23,6 @@ from Pages import game
 from Pages import welcome
 from Pages import character_select
 
-
 # --------------------------------------------------------------------------
 # Variable Definitions
 # -------------------------------------------------------------------------

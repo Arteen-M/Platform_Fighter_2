@@ -110,9 +110,9 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
 
     bg = background.Background(path+"Images/Background/frames/", 20, 8, display)
 
-    musicObj = pygame.mixer.Sound(path+"Music/PlatformBanger2 (3).wav")
-    musicObj.set_volume(0.5)
-    musicObj.play(-1)
+    #musicObj = pygame.mixer.Sound(path+"Music/PlatformBanger2 (3).wav")
+    #musicObj.set_volume(0.5)
+    #musicObj.play(-1)
 
     P1HitMusic = pygame.mixer.Sound(path+"Music/HitSfX.wav")
     P2HitMusic = pygame.mixer.Sound(path+"Music/HitSfX.wav")
