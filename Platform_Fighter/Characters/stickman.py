@@ -37,7 +37,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                  controls=(K_LEFT, K_RIGHT, K_UP, K_DOWN, K_h, K_q, K_e), stocks=3):
         super().__init__()
         self.surf = pygame.Surface((30, 50))  # Surface (hurtbox) size
-        self.image = pygame.image.load(path+"Images/Stickman/stickman.png").convert_alpha()
+        self.image = pygame.image.load(path + "Images/Stickman/stickman.png").convert_alpha()
         self.rect = self.surf.get_rect(midbottom=spawn_position)  # Position (midbottom so it's easier to work with)
         self.image_rect = self.image.get_rect(midbottom=spawn_position)
 
@@ -69,6 +69,8 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
 
         # Color for Skins
         self.color = color
+        self.invincible_color = (0, 255, 0)
+        self.initial_color = color
         self.surf.fill(self.color)
 
         # Control Scheme
@@ -115,163 +117,561 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
 
         self.in_shield = False
 
-        self.idle_frames_right = [pygame.image.load(path+"Images/Stickman/Idle Cycle/Idle_%d.png" % x).convert_alpha() for x in range(1, 73)]
+        self.idle_frames_right = [pygame.image.load(path + "Images/Stickman/Idle Cycle/Idle_%d.png" % x).convert_alpha()
+                                  for x in range(1, 73)]
         self.idle_cycle_right = 0
 
-        self.idle_frames_left = [pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Idle Cycle/Idle_%d.png" % x), True, False).convert_alpha() for x in range(1, 73)]
+        self.idle_frames_left = [
+            pygame.transform.flip(pygame.image.load(path + "Images/Stickman/Idle Cycle/Idle_%d.png" % x), True,
+                                  False).convert_alpha() for x in range(1, 73)]
         self.idle_cycle_left = 0
 
-        self.walk_frames_right = [pygame.image.load(path+"Images/Stickman/Walk Cycle/Walk_%d.png" % x).convert_alpha() for x in range(1, 17)]
+        self.walk_frames_right = [pygame.image.load(path + "Images/Stickman/Walk Cycle/Walk_%d.png" % x).convert_alpha()
+                                  for x in range(1, 17)]
         self.walk_cycle_right = 0
 
-        self.walk_frames_left = [pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Walk Cycle/Walk_%d.png" % x), True, False).convert_alpha() for x in range(1, 17)]
+        self.walk_frames_left = [
+            pygame.transform.flip(pygame.image.load(path + "Images/Stickman/Walk Cycle/Walk_%d.png" % x), True,
+                                  False).convert_alpha() for x in range(1, 17)]
         self.walk_cycle_left = 0
 
-        self.up_special_frames = [pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_0.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_1.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_2.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_3.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_4.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_5.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_6.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_7.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_8.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_9.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_10.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_11.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_12.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_13.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_14.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_15.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_16.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_18.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_18.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_19.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_19.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_20.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_20.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_21.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_21.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_22.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_22.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_23.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_23.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_24.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_24.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_25.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_25.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_26.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_26.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_27.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_27.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_28.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_28.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_29.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_29.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_30.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_30.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_31.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_31.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_32.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_32.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
-                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha()]
+        self.up_special_frames = [
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_0.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_1.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_2.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_3.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_4.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_5.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_6.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_7.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_8.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_9.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_10.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_11.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_12.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_13.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_14.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_15.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_16.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_18.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_18.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_19.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_19.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_20.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_20.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_21.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_21.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_22.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_22.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_23.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_23.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_24.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_24.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_25.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_25.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_26.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_26.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_27.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_27.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_28.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_28.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_29.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_29.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_30.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_30.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_31.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_31.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_32.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_32.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+            pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_33.png").convert_alpha()]
 
         self.up_special_frames_right = []
-        for x in range(len(self.up_special_frames)-1, -1, -1):
+        for x in range(len(self.up_special_frames) - 1, -1, -1):
             self.up_special_frames_right.append(self.up_special_frames[x])
+
         self.up_special_cycle_right = 0
 
         self.up_special_frames_left = []
-        for x in range(len(self.up_special_frames)-1, -1, -1):
+        for x in range(len(self.up_special_frames) - 1, -1, -1):
             self.up_special_frames_left.append(pygame.transform.flip(self.up_special_frames[x], True, False))
 
         self.up_special_cycle_left = 0
 
-        self.f_tilt_frames_right = [pygame.image.load(path+"Images/Stickman/Forward Tilt/stick_char_ftilt-%d.png" % (15 - x // 2)).convert_alpha() for x in range(2, 29)]
+        self.up_special_sweet_hitbox = (30, 25)
+        self.up_special_sweet_frames = 13
+        self.up_special_sweet_start_flag = 4
+        self.up_special_sweet_end_flag = 1
+        self.up_special_sweet_angle = (0.1, 0.9)
+        self.up_special_sweet_dmg = 10
+        self.up_special_sweet_base = 4
+        self.up_special_sweet_scale = 0.3
+        self.up_special_sweet_hitstun = 15
+
+        self.up_special_sour_hitbox = (20, 60)
+        self.up_special_sour_frames = 64
+        self.up_special_sour_start_flag = 63
+        self.up_special_sour_end_flag = 43
+        self.up_special_sour_angle = (0.3, 0.7)
+        self.up_special_sour_dmg = 5
+        self.up_special_sour_base = 3
+        self.up_special_sour_scale = 0.2
+        self.up_special_sour_hitstun = 5
+
+        self.side_special_frames = [pygame.image.load(
+            path + "Images/Stickman/Side Special/Side_Special_0.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_0.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_1.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_1.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_2.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_2.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_3.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_3.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_4.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_4.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_5.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_5.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_6.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_6.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_7.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_7.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_8.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_8.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_9.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_9.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_10.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_10.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_11.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_11.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_12.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_12.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_13.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_13.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_14.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_14.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_15.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_15.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_16.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_16.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_16.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_16.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_16.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_16.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_16.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_16.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_16.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_16.png").convert_alpha(),
+                                    pygame.image.load(
+                                        path + "Images/Stickman/Side Special/Side_Special_16.png").convert_alpha()]
+
+        self.side_special_frames_right = []
+        for x in range(len(self.side_special_frames) - 1, -1, -1):
+            self.side_special_frames_right.append(self.side_special_frames[x])
+
+        self.side_special_cycle_right = 0
+
+        self.side_special_frames_left = []
+        for x in range(len(self.side_special_frames) - 1, -1, -1):
+            self.side_special_frames_left.append(pygame.transform.flip(self.side_special_frames[x], True, False))
+
+        self.side_special_cycle_left = 0
+
+        self.side_special_hitbox = (60, 20)
+        self.side_special_frames = 43
+        self.side_special_start_flag = 11
+        self.side_special_end_flag = 1
+        self.side_special_angle = (0.7, 0.3)
+        self.side_special_dmg = 7
+        self.side_special_base = 1.5
+        self.side_special_scale = 0.2
+        self.side_special_hitstun = 5
+
+        self.down_special_ground_frames = [pygame.image.load(
+            path + "Images/Stickman/Down Special/Down_Special_0.png").convert_alpha(),
+                                           pygame.image.load(
+                                               path + "Images/Stickman/Down Special/Down_Special_1.png").convert_alpha(),
+                                           pygame.image.load(
+                                               path + "Images/Stickman/Down Special/Down_Special_2.png").convert_alpha(),
+                                           pygame.image.load(
+                                               path + "Images/Stickman/Down Special/Down_Special_3.png").convert_alpha(),
+                                           pygame.image.load(
+                                               path + "Images/Stickman/Down Special/Down_Special_4.png").convert_alpha(),
+                                           pygame.image.load(
+                                               path + "Images/Stickman/Down Special/Down_Special_5.png").convert_alpha(),
+                                           pygame.image.load(
+                                               path + "Images/Stickman/Down Special/Down_Special_6.png").convert_alpha(),
+                                           pygame.image.load(
+                                               path + "Images/Stickman/Down Special/Down_Special_7.png").convert_alpha(),
+                                           pygame.image.load(
+                                               path + "Images/Stickman/Down Special/Down_Special_8.png").convert_alpha(),
+                                           pygame.image.load(
+                                               path + "Images/Stickman/Down Special/Down_Special_9.png").convert_alpha(),
+                                           pygame.image.load(
+                                               path + "Images/Stickman/Down Special/Down_Special_10.png").convert_alpha(),
+                                           pygame.image.load(
+                                               path + "Images/Stickman/Down Special/Down_Special_11.png").convert_alpha(),
+                                           pygame.image.load(
+                                               path + "Images/Stickman/Down Special/Down_Special_12.png").convert_alpha(),
+                                           pygame.image.load(
+                                               path + "Images/Stickman/Down Special/Down_Special_13.png").convert_alpha(),
+                                           pygame.image.load(
+                                               path + "Images/Stickman/Down Special/Down_Special_14.png").convert_alpha(),
+                                           pygame.image.load(
+                                               path + "Images/Stickman/Down Special/Down_Special_15.png").convert_alpha(),
+                                           pygame.image.load(
+                                               path + "Images/Stickman/Down Special/Down_Special_16.png").convert_alpha(),
+                                           pygame.image.load(
+                                               path + "Images/Stickman/Down Special/Down_Special_17.png").convert_alpha(),
+                                           pygame.image.load(
+                                               path + "Images/Stickman/Down Special/Down_Special_18.png").convert_alpha(),
+                                           pygame.image.load(
+                                               path + "Images/Stickman/Down Special/Down_Special_19.png").convert_alpha()]
+        self.down_special_air_frames = [pygame.image.load(
+            path + "Images/Stickman/Down Special/Down_Special_air_0.png").convert_alpha(),
+                                        pygame.image.load(
+                                            path + "Images/Stickman/Down Special/Down_Special_air_1.png").convert_alpha(),
+                                        pygame.image.load(
+                                            path + "Images/Stickman/Down Special/Down_Special_air_2.png").convert_alpha(),
+                                        pygame.image.load(
+                                            path + "Images/Stickman/Down Special/Down_Special_air_3.png").convert_alpha(),
+                                        pygame.image.load(
+                                            path + "Images/Stickman/Down Special/Down_Special_air_4.png").convert_alpha(),
+                                        pygame.image.load(
+                                            path + "Images/Stickman/Down Special/Down_Special_air_5.png").convert_alpha(),
+                                        pygame.image.load(
+                                            path + "Images/Stickman/Down Special/Down_Special_air_6.png").convert_alpha(),
+                                        pygame.image.load(
+                                            path + "Images/Stickman/Down Special/Down_Special_air_7.png").convert_alpha(),
+                                        pygame.image.load(
+                                            path + "Images/Stickman/Down Special/Down_Special_air_8.png").convert_alpha(),
+                                        pygame.image.load(
+                                            path + "Images/Stickman/Down Special/Down_Special_air_9.png").convert_alpha(),
+                                        pygame.image.load(
+                                            path + "Images/Stickman/Down Special/Down_Special_air_10.png").convert_alpha(),
+                                        pygame.image.load(
+                                            path + "Images/Stickman/Down Special/Down_Special_air_11.png").convert_alpha(),
+                                        pygame.image.load(
+                                            path + "Images/Stickman/Down Special/Down_Special_air_12.png").convert_alpha(),
+                                        pygame.image.load(
+                                            path + "Images/Stickman/Down Special/Down_Special_air_13.png").convert_alpha(),
+                                        pygame.image.load(
+                                            path + "Images/Stickman/Down Special/Down_Special_air_14.png").convert_alpha(),
+                                        pygame.image.load(
+                                            path + "Images/Stickman/Down Special/Down_Special_air_15.png").convert_alpha(),
+                                        pygame.image.load(
+                                            path + "Images/Stickman/Down Special/Down_Special_air_16.png").convert_alpha(),
+                                        pygame.image.load(
+                                            path + "Images/Stickman/Down Special/Down_Special_air_16.png").convert_alpha()]
+
+        self.down_special_ground_frames_right = []
+        for x in range(len(self.down_special_ground_frames) - 1, -1, -1):
+            self.down_special_ground_frames_right.append(self.down_special_ground_frames[x])
+
+        self.down_special_ground_cycle_right = 0
+
+        self.down_special_ground_frames_left = []
+        for x in range(len(self.down_special_ground_frames) - 1, -1, -1):
+            self.down_special_ground_frames_left.append(
+                pygame.transform.flip(self.down_special_ground_frames[x], True, False))
+
+        self.down_special_ground_cycle_left = 0
+
+        self.down_special_air_frames_right = []
+        for x in range(len(self.down_special_air_frames) - 1, -1, -1):
+            self.down_special_air_frames_right.append(self.down_special_air_frames[x])
+
+        self.down_special_air_cycle_right = 0
+
+        self.down_special_air_frames_left = []
+        for x in range(len(self.down_special_air_frames) - 1, -1, -1):
+            self.down_special_air_frames_left.append(
+                pygame.transform.flip(self.down_special_air_frames[x], True, False))
+
+        self.down_special_air_cycle_left = 0
+
+        self.down_special_ground_hitbox = (40, 40)
+        self.down_special_ground_frames = 20
+        self.down_special_ground_start_flag = 17
+        self.down_special_ground_end_flag = 4
+        self.down_special_ground_angle = (0.35, 0.65)
+        self.down_special_ground_dmg = 5
+        self.down_special_ground_base = 2
+        self.down_special_ground_scale = 0.1
+        self.down_special_ground_hitstun = 15
+
+        self.f_tilt_frames_right = [pygame.image.load(
+            path + "Images/Stickman/Forward Tilt/stick_char_ftilt-%d.png" % (15 - x // 2)).convert_alpha() for x in
+                                    range(2, 29)]
         self.f_tilt_cycle_right = 0
 
-        self.f_tilt_frames_left = [pygame.transform.flip(pygame.image.load(path + "Images/Stickman/Forward Tilt/stick_char_ftilt-%d.png" % (15 - x // 2)), True, False).convert_alpha() for x in range(2, 29)]
+        self.f_tilt_frames_left = [pygame.transform.flip(
+            pygame.image.load(path + "Images/Stickman/Forward Tilt/stick_char_ftilt-%d.png" % (15 - x // 2)), True,
+            False).convert_alpha() for x in range(2, 29)]
         self.f_tilt_cycle_left = 0
 
-        self.d_tilt_frames_right = [pygame.image.load(path+"Images/Stickman/Down Tilt/stick_char_dtilt-%d.png" % (7 - x // 2)).convert_alpha() for x in range(2, 12)]
+        self.f_tilt_hitbox = (40, 20)
+        self.f_tilt_frames = 28
+        self.f_tilt_start_flag = 14
+        self.f_tilt_end_flag = 8
+        self.f_tilt_angle = (0.6, 0.4)
+        self.f_tilt_dmg = 7
+        self.f_tilt_base = 1.5
+        self.f_tilt_scale = 0.2
+        self.f_tilt_hitstun = 10
+
+        self.d_tilt_frames_right = [
+            pygame.image.load(path + "Images/Stickman/Down Tilt/stick_char_dtilt-%d.png" % (7 - x // 2)).convert_alpha()
+            for x in range(2, 12)]
         self.d_tilt_cycle_right = 0
 
-        self.d_tilt_frames_left = [pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Down Tilt/stick_char_dtilt-%d.png" % (7 - x // 2)), True, False).convert_alpha() for x in range(2, 12)]
+        self.d_tilt_frames_left = [pygame.transform.flip(
+            pygame.image.load(path + "Images/Stickman/Down Tilt/stick_char_dtilt-%d.png" % (7 - x // 2)), True,
+            False).convert_alpha() for x in range(2, 12)]
         self.d_tilt_cycle_left = 0
 
-        self.up_tilt_frames_right = [pygame.image.load(path+"Images/Stickman/Up Tilt/stick_char_uptilt-%d.png" % (19 - x // 2)).convert_alpha() for x in range(2, 36)]
+        self.d_tilt_hitbox = (30, 20)
+        self.d_tilt_frames = 12
+        self.d_tilt_start_flag = 4
+        self.d_tilt_end_flag = 1
+        self.d_tilt_angle = (0.35, 0.65)
+        self.d_tilt_dmg = 3
+        self.d_tilt_base = 2
+        self.d_tilt_scale = 0.1
+        self.d_tilt_hitstun = 10
+
+        self.up_tilt_frames_right = [
+            pygame.image.load(path + "Images/Stickman/Up Tilt/stick_char_uptilt-%d.png" % (19 - x // 2)).convert_alpha()
+            for x in range(2, 36)]
         self.up_tilt_cycle_right = 0
 
-        self.up_tilt_frames_left = [pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Up Tilt/stick_char_uptilt-%d.png" % (19 - x // 2)), True, False).convert_alpha() for x in range(2, 36)]
+        self.up_tilt_frames_left = [pygame.transform.flip(
+            pygame.image.load(path + "Images/Stickman/Up Tilt/stick_char_uptilt-%d.png" % (19 - x // 2)), True,
+            False).convert_alpha() for x in range(2, 36)]
         self.up_tilt_cycle_left = 0
 
-        self.nair_frames_right = [pygame.image.load(path+"Images/Stickman/Neutral Air/Nair_%d.png" % x).convert_alpha() for x in range(0, 28)]
+        self.up_tilt_hitbox = (30, 30)
+        self.up_tilt_frames = 20
+        self.up_tilt_start_flag = 14
+        self.up_tilt_end_flag = 10
+        self.up_tilt_angle = (-0.5, 0.5)
+        self.up_tilt_angle2 = (0.5, 0.5)
+        self.up_tilt_dmg = 5
+        self.up_tilt_base = 5
+        self.up_tilt_scale = 0
+        self.up_tilt_hitstun = 10
+
+        self.up_tilt_final_hitbox = (15, 50)
+        self.up_tilt_final_frames = 16
+        self.up_tilt_final_start_flag = 15
+        self.up_tilt_final_end_flag = 5
+        self.up_tilt_final_angle = (0, 1)
+        self.up_tilt_final_dmg = 4
+        self.up_tilt_final_base = 1.2
+        self.up_tilt_final_scale = 0.3
+        self.up_tilt_final_hitstun = 10
+
+        self.nair_frames_right = [
+            pygame.image.load(path + "Images/Stickman/Neutral Air/Nair_%d.png" % x).convert_alpha() for x in
+            range(0, 28)]
         self.nair_cycle_right = 0
 
-        self.nair_frames_left = [pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Neutral Air/Nair_%d.png" % x), True, False).convert_alpha() for x in range(0, 28)]
+        self.nair_frames_left = [
+            pygame.transform.flip(pygame.image.load(path + "Images/Stickman/Neutral Air/Nair_%d.png" % x), True,
+                                  False).convert_alpha() for x in range(0, 28)]
         self.nair_cycle_left = 0
 
-        self.fair_frames_right = [pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Forward Air/stick_char_fair-%d.png" % x), True, False).convert_alpha() for x in range(1, 19)]
+        self.n_tilt_hitbox = (60, 30)
+        self.n_tilt_frames = 28
+        self.n_tilt_start_flag = 24
+        self.n_tilt_end_flag = 2
+        self.n_tilt_angle = (0.5, 0.5)
+        self.n_tilt_dmg = 5
+        self.n_tilt_base = 1
+        self.n_tilt_scale = 0.2
+        self.n_tilt_hitstun = 10
+
+        self.nair_hitbox = (60, 30)
+        self.nair_frames = 10
+        self.nair_start_flag = 6
+        self.nair_end_flag = 4
+        self.nair_angle = (0, 0.5)
+        self.nair_dmg = 1
+        self.nair_base = 1
+        self.nair_scale = 0.2
+        self.nair_hitstun = 10
+
+        self.nair_final_hitbox = (60, 30)
+        self.nair_final_frames = 16
+        self.nair_final_start_flag = 8
+        self.nair_final_end_flag = 1
+        self.nair_final_angle = (0.5, 0.5)
+        self.nair_final_dmg = 5
+        self.nair_final_base = 1
+        self.nair_final_scale = 0.2
+        self.nair_final_hitstun = 10
+
+        self.fair_frames_right = [
+            pygame.transform.flip(pygame.image.load(path + "Images/Stickman/Forward Air/stick_char_fair-%d.png" % x),
+                                  True, False).convert_alpha() for x in range(1, 19)]
         self.fair_cycle_right = 0
 
-        self.fair_frames_left = [pygame.image.load(path+"Images/Stickman/Forward Air/stick_char_fair-%d.png" % x).convert_alpha() for x in range(1, 19)]
+        self.fair_frames_left = [
+            pygame.image.load(path + "Images/Stickman/Forward Air/stick_char_fair-%d.png" % x).convert_alpha() for x in
+            range(1, 19)]
         self.fair_cycle_left = 0
 
-        self.up_air_frames_right = [pygame.image.load(path+"Images/Stickman/Up Air/stick_char_upair-%d.png" % (9 - x // 2)).convert_alpha() for x in range(2, 18)]
+        self.fair_hitbox = (60, 30)
+        self.fair_frames = 28
+        self.fair_start_flag = 24
+        self.fair_end_flag = 18
+        self.fair_angle = (0.6, 0.4)
+        self.fair_dmg = 7
+        self.fair_base = 1.5
+        self.fair_scale = 0.2
+        self.fair_hitstun = 10
+
+        self.up_air_frames_right = [
+            pygame.image.load(path + "Images/Stickman/Up Air/stick_char_upair-%d.png" % (9 - x // 2)).convert_alpha()
+            for x in range(2, 18)]
         self.up_air_cycle_right = 0
 
-        self.up_air_frames_left = [pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Up Air/stick_char_upair-%d.png" % (9 - x // 2)), True, False).convert_alpha() for x in range(2, 18)]
+        self.up_air_frames_left = [pygame.transform.flip(
+            pygame.image.load(path + "Images/Stickman/Up Air/stick_char_upair-%d.png" % (9 - x // 2)), True,
+            False).convert_alpha() for x in range(2, 18)]
         self.up_air_cycle_left = 0
 
-        self.dair_frames_right = [pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Down Air/stick_char_dair-%d.png" % (x // 2)), True, False).convert_alpha() for x in range(2, 21)]
+        self.up_air_hitbox = (40, 40)
+        self.up_air_frames = 16
+        self.up_air_start_flag = 10
+        self.up_air_end_flag = 5
+        self.up_air_angle = (0.15, 0.7)
+        self.up_air_dmg = 4
+        self.up_air_base = 1.2
+        self.up_air_scale = 0.3
+        self.up_air_hitstun = 10
+
+        self.dair_frames_right = [pygame.transform.flip(
+            pygame.image.load(path + "Images/Stickman/Down Air/stick_char_dair-%d.png" % (x // 2)), True,
+            False).convert_alpha() for x in range(2, 21)]
         self.dair_cycle_right = 0
 
-        self.dair_frames_left = [pygame.image.load(path+"Images/Stickman/Down Air/stick_char_dair-%d.png" % (x // 2)).convert_alpha() for x in range(2, 21)]
+        self.dair_frames_left = [
+            pygame.image.load(path + "Images/Stickman/Down Air/stick_char_dair-%d.png" % (x // 2)).convert_alpha() for x
+            in range(2, 21)]
         self.dair_cycle_left = 0
 
-        self.bair_frames_right = [pygame.image.load(path+"Images/Stickman/Back Air/stick_char_bair-%d.png" % (14 - x // 2)).convert_alpha() for x in range(2, 28)]
+        self.dair_hitbox = (40, 30)
+        self.dair_frames = 20
+        self.dair_start_flag = 15
+        self.dair_end_flag = 5
+        self.dair_angle = (0.05, -0.6)
+        self.dair_dmg = 10
+        self.dair_base = 1.5
+        self.dair_scale = 0.3
+        self.dair_hitstun = 10
+
+        self.bair_frames_right = [
+            pygame.image.load(path + "Images/Stickman/Back Air/stick_char_bair-%d.png" % (14 - x // 2)).convert_alpha()
+            for x in range(2, 28)]
         self.bair_cycle_right = 0
 
-        self.bair_frames_left = [pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Back Air/stick_char_bair-%d.png" % (14 - x // 2)), True, False).convert_alpha() for x in range(2, 28)]
+        self.bair_frames_left = [pygame.transform.flip(
+            pygame.image.load(path + "Images/Stickman/Back Air/stick_char_bair-%d.png" % (14 - x // 2)), True,
+            False).convert_alpha() for x in range(2, 28)]
         self.bair_cycle_left = 0
 
-        self.air_image_right = pygame.image.load(path+"Images/Stickman/Walk Cycle/Walk_16.png").convert_alpha()
-        self.air_image_left = pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Walk Cycle/Walk_16.png"), True, False).convert_alpha()
+        self.bair_hitbox = (30, 20)
+        self.bair_frames = 28
+        self.bair_start_flag = 10
+        self.bair_end_flag = 4
+        self.bair_angle = (-0.65, 0.35)
+        self.bair_dmg = 8
+        self.bair_base = 1
+        self.bair_scale = 0.2
+        self.bair_hitstun = 10
 
-        self.hurt_image_right = pygame.image.load(path+"Images/Stickman/Hitstun/stick_char_hitstun-1.png").convert_alpha()
-        self.hurt_image_left = pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Hitstun/stick_char_hitstun-1.png"), True, False).convert_alpha()
+        self.air_image_right = pygame.image.load(path + "Images/Stickman/Walk Cycle/Walk_16.png").convert_alpha()
+        self.air_image_left = pygame.transform.flip(pygame.image.load(path + "Images/Stickman/Walk Cycle/Walk_16.png"),
+                                                    True, False).convert_alpha()
 
-        self.crouch_image_right = pygame.image.load(path+"Images/Stickman/Crouch/stick_char_crouch-2.png").convert_alpha()
-        self.crouch_image_left = pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Crouch/stick_char_crouch-2.png"), True, False).convert_alpha()
+        self.hurt_image_right = pygame.image.load(
+            path + "Images/Stickman/Hitstun/stick_char_hitstun-1.png").convert_alpha()
+        self.hurt_image_left = pygame.transform.flip(
+            pygame.image.load(path + "Images/Stickman/Hitstun/stick_char_hitstun-1.png"), True, False).convert_alpha()
+
+        self.crouch_image_right = pygame.image.load(
+            path + "Images/Stickman/Crouch/stick_char_crouch-2.png").convert_alpha()
+        self.crouch_image_left = pygame.transform.flip(
+            pygame.image.load(path + "Images/Stickman/Crouch/stick_char_crouch-2.png"), True, False).convert_alpha()
 
         self.nair_image_skew = (0, 25)
         self.fair_image_skew = (0, 15)
@@ -282,30 +682,114 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.d_tilt_image_skew = (0, 0)
         self.up_tilt_image_skew = (0, 0)
         self.crouch_image_skew = (0, 0)
+        self.up_special_image_skew = (0, 0)
+        self.side_special_image_skew = (0, 0)
+        self.down_special_ground_image_skew = (0, 0)
 
-        self.nair_count = 0  # MAX IS 4
         self.up_special_sweet_spot = False
 
         # Hitboxes for each usable attack
-        #                                name      size       display   lag  sf  ef dir  angle    dmg b  s  hitstun  color
-        self.ng_attack = hitbox.HitBox("Neutral", (60, 30), self.display, 28, 24, 2, 1, (0.5, 0.5), 5, 1, 0.2, 10, self.color)
-        self.nair_attack1 = hitbox.HitBox("Neutral", (60, 30), self.display, 10, 6, 2, 1, (0, 0.5), 1, 1, 0.2, 10, self.color)
-        self.nair_attack2 = hitbox.HitBox("Neutral", (60, 30), self.display, 10, 6, 2, 1, (0.1, 0.1), 1, 1, 0.2, 10, self.color)
-        self.nair_final = hitbox.HitBox("Neutral", (60, 30), self.display, 16, 8, 1, 1, (0.5, 0.5), 5, 1, 0.2, 10, self.color)
-        self.f_tilt_attack = hitbox.HitBox("Forward", (40, 20), self.display, 28, 14, 8, 1, (0.6, 0.4), 7, 1.5, 0.2, 10, self.color)
-        self.f_air_attack = hitbox.HitBox("Forward", (60, 30), self.display, 28, 24, 18, 1, (0.6, 0.4), 7, 1.5, 0.2, 10, self.color)
-        self.b_attack = hitbox.HitBox("Back", (30, 20), self.display, 28, 10, 4, 1, (-0.65, 0.35), 8, 1, 0.2, 10, self.color)
-        self.up_tilt_attack1 = hitbox.HitBox("Up", (30, 30), self.display, 20, 14, 10, 1, (-0.5, 0.5), 5, 5, 0, 10, self.color)
-        self.up_tilt_attack2 = hitbox.HitBox("Up", (30, 30), self.display, 20, 14, 10, 1, (0.5, 0.5), 5, 5, 0, 10, self.color)
-        self.up_tilt_final = hitbox.HitBox("Up", (15, 50), self.display, 16, 15, 5, 1, (0, 1), 4, 1.2, 0.3, 10, self.color)
-        self.u_air_attack = hitbox.HitBox("Up", (40, 40), self.display, 16, 10, 5, 1, (0.15, 0.7), 4, 1.2, 0.3, 10, self.color)
-        self.d_tilt_attack = hitbox.HitBox("Down", (30, 20), self.display, 12, 4, 1, 1, (0.35, 0.65), 3, 2, 0.1, 10, self.color)
-        self.dair_attack = hitbox.HitBox("Down", (40, 30), self.display, 20, 15, 5, 1, (0.05, -0.6), 10, 1.5, 0.3, 10, self.color)
-        self.up_special_sweet = hitbox.HitBox("Up", (30, 25), self.display, 13, 4, 1, 1, (0.1, 0.9), 10, 4, 0.3, 15, self.color)
-        self.up_special_sour = hitbox.HitBox("Up", (20, 60), self.display, 64, 63, 43, 1, (0.3, 0.7), 5, 0.2, 0.2, 5, self.color)
+        self.ng_attack = hitbox.HitBox("Neutral", self.n_tilt_hitbox, self.display, self.n_tilt_frames,
+                                       self.n_tilt_start_flag, self.n_tilt_end_flag, 1, self.n_tilt_angle,
+                                       self.n_tilt_dmg, self.n_tilt_base, self.n_tilt_scale, self.n_tilt_hitstun,
+                                       self.color)
+
+        self.nair_attack1 = hitbox.HitBox("Neutral", self.nair_hitbox, self.display, self.nair_frames,
+                                          self.nair_start_flag, self.nair_end_flag, 1, self.nair_angle,
+                                          self.nair_dmg, self.nair_base, self.nair_scale, self.nair_hitstun,
+                                          self.color)
+
+        self.nair_attack2 = hitbox.HitBox("Neutral", self.nair_hitbox, self.display, self.nair_frames,
+                                          self.nair_start_flag, self.nair_end_flag, 1, self.nair_angle,
+                                          self.nair_dmg, self.nair_base, self.nair_scale, self.nair_hitstun,
+                                          self.color)
+
+        self.nair_final = hitbox.HitBox("Neutral", self.nair_final_hitbox, self.display, self.nair_final_frames,
+                                        self.nair_final_start_flag, self.nair_final_end_flag, 1,
+                                        self.nair_final_angle, self.nair_final_dmg, self.nair_final_base,
+                                        self.nair_final_scale, self.nair_final_hitstun, self.color)
+
+        self.f_tilt_attack = hitbox.HitBox("Forward", self.f_tilt_hitbox, self.display, self.f_tilt_frames,
+                                           self.f_tilt_start_flag, self.f_tilt_end_flag, 1, self.f_tilt_angle,
+                                           self.f_tilt_dmg, self.f_tilt_base, self.f_tilt_scale, self.f_tilt_hitstun,
+                                           self.color)
+
+        self.f_air_attack = hitbox.HitBox("Forward", self.fair_hitbox, self.display, self.fair_frames,
+                                          self.fair_start_flag, self.fair_end_flag, 1, self.fair_angle,
+                                          self.fair_dmg, self.fair_base, self.fair_scale, self.fair_hitstun,
+                                          self.color)
+
+        self.b_attack = hitbox.HitBox("Back", self.bair_hitbox, self.display, self.bair_frames,
+                                      self.bair_start_flag, self.bair_end_flag, 1, self.bair_angle,
+                                      self.bair_dmg, self.bair_base, self.bair_scale, self.bair_hitstun,
+                                      self.color)
+
+        self.up_tilt_attack1 = hitbox.HitBox("Up", self.up_tilt_hitbox, self.display, self.up_tilt_frames,
+                                             self.up_tilt_start_flag, self.up_tilt_end_flag, 1, self.up_tilt_angle,
+                                             self.up_tilt_dmg, self.up_tilt_base, self.up_tilt_scale,
+                                             self.up_tilt_hitstun,
+                                             self.color)
+
+        self.up_tilt_attack2 = hitbox.HitBox("Up", self.up_tilt_hitbox, self.display, self.up_tilt_frames,
+                                             self.up_tilt_start_flag, self.up_tilt_end_flag, 1, self.up_tilt_angle2,
+                                             self.up_tilt_dmg, self.up_tilt_base, self.up_tilt_scale,
+                                             self.up_tilt_hitstun,
+                                             self.color)
+
+        self.up_tilt_final = hitbox.HitBox("Up", self.up_tilt_final_hitbox, self.display, self.up_tilt_final_frames,
+                                           self.up_tilt_final_start_flag, self.up_tilt_final_end_flag, 1,
+                                           self.up_tilt_final_angle, self.up_tilt_final_dmg, self.up_tilt_final_base,
+                                           self.up_tilt_final_scale, self.up_tilt_final_hitstun, self.color)
+
+        self.u_air_attack = hitbox.HitBox("Up", self.up_air_hitbox, self.display, self.up_air_frames,
+                                          self.up_air_start_flag, self.up_air_end_flag, 1, self.up_air_angle,
+                                          self.up_air_dmg, self.up_air_base, self.up_air_scale, self.up_air_hitstun,
+                                          self.color)
+
+        self.d_tilt_attack = hitbox.HitBox("Down", self.d_tilt_hitbox, self.display, self.d_tilt_frames,
+                                           self.d_tilt_start_flag, self.d_tilt_end_flag, 1, self.d_tilt_angle,
+                                           self.d_tilt_dmg, self.d_tilt_base, self.d_tilt_scale, self.d_tilt_hitstun,
+                                           self.color)
+
+        self.dair_attack = hitbox.HitBox("Down", self.dair_hitbox, self.display, self.dair_frames,
+                                         self.dair_start_flag, self.dair_end_flag, 1, self.dair_angle,
+                                         self.dair_dmg, self.dair_base, self.dair_scale, self.dair_hitstun,
+                                         self.color)
+
+        self.up_special_sweet = hitbox.HitBox("Up", self.up_special_sweet_hitbox, self.display,
+                                              self.up_special_sweet_frames, self.up_special_sweet_start_flag,
+                                              self.up_special_sweet_end_flag, 1, self.up_special_sweet_angle,
+                                              self.up_special_sweet_dmg, self.up_special_sweet_base,
+                                              self.up_special_sweet_scale, self.up_special_sweet_hitstun, self.color)
+
+        self.up_special_sour = hitbox.HitBox("Up", self.up_special_sour_hitbox, self.display,
+                                             self.up_special_sour_frames, self.up_special_sour_start_flag,
+                                             self.up_special_sour_end_flag, 1, self.up_special_sour_angle,
+                                             self.up_special_sour_dmg, self.up_special_sour_base,
+                                             self.up_special_sour_scale, self.up_special_sour_hitstun, self.color)
+
+        self.side_special_attack = hitbox.HitBox("Side", self.side_special_hitbox, self.display,
+                                                 self.side_special_frames, self.side_special_start_flag,
+                                                 self.side_special_end_flag, 1, self.side_special_angle,
+                                                 self.side_special_dmg, self.side_special_base,
+                                                 self.side_special_scale, self.side_special_hitstun, self.color)
+
+        self.down_special_ground_attack = hitbox.HitBox("Down", self.down_special_ground_hitbox, self.display,
+                                                        self.down_special_ground_frames,
+                                                        self.down_special_ground_start_flag,
+                                                        self.down_special_ground_end_flag, 1,
+                                                        self.down_special_ground_angle,
+                                                        self.down_special_ground_dmg, self.down_special_ground_base,
+                                                        self.down_special_ground_scale,
+                                                        self.down_special_ground_hitstun,
+                                                        self.color)
 
         # Hitbox groups
-        self.all_hitboxes = [self.ng_attack, self.nair_attack1, self.nair_attack2, self.nair_final, self.f_tilt_attack, self.f_air_attack, self.b_attack, self.u_air_attack, self.up_tilt_attack1, self.up_tilt_attack2, self.up_tilt_final, self.d_tilt_attack, self.dair_attack, self.up_special_sweet, self.up_special_sour]
+        self.all_hitboxes = [self.ng_attack, self.nair_attack1, self.nair_attack2, self.nair_final, self.f_tilt_attack,
+                             self.f_air_attack, self.b_attack, self.u_air_attack, self.up_tilt_attack1,
+                             self.up_tilt_attack2, self.up_tilt_final, self.d_tilt_attack, self.dair_attack,
+                             self.up_special_sweet, self.up_special_sour, self.side_special_attack,
+                             self.down_special_ground_attack]
         self.active_hitboxes = pygame.sprite.Group()
 
         self.image_skew = (0, 0)
@@ -345,6 +829,9 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
     def countInvincibility(self):
         if self.invincibility > 0:
             self.invincibility -= 1
+            self.color = self.invincible_color
+        else:
+            self.color = self.initial_color
 
     # Reduce the frozen by 1
     def countFrozen(self):
@@ -410,6 +897,38 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             if self.up_special_cycle_left > 0:
                 self.up_special_cycle_left -= 1
 
+    def sidespecialCycleSet(self):
+        if self.direction:
+            if self.side_special_cycle_right == 0:
+                self.side_special_cycle_right = len(self.side_special_frames_right) - 1
+        else:
+            if self.side_special_cycle_left == 0:
+                self.side_special_cycle_left = len(self.side_special_frames_left) - 1
+
+    def countSidebCycle(self):
+        if self.direction:
+            if self.side_special_cycle_right > 0:
+                self.side_special_cycle_right -= 1
+        else:
+            if self.side_special_cycle_left > 0:
+                self.side_special_cycle_left -= 1
+
+    def downSpecialGroundCycleSet(self):
+        if self.direction:
+            if self.down_special_ground_cycle_right == 0:
+                self.down_special_ground_cycle_right = len(self.down_special_ground_frames_right) - 1
+        else:
+            if self.down_special_ground_cycle_left == 0:
+                self.down_special_ground_cycle_left = len(self.down_special_ground_frames_left) - 1
+
+    def countDownSpecialGroundCycle(self):
+        if self.direction:
+            if self.down_special_ground_cycle_right > 0:
+                self.down_special_ground_cycle_right -= 1
+        else:
+            if self.down_special_ground_cycle_left > 0:
+                self.down_special_ground_cycle_left -= 1
+
     def ftiltCycleSet(self):
         if self.direction:
             if self.f_tilt_cycle_right == 0:
@@ -437,7 +956,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
     def countDtiltCycle(self):
         if self.direction:
             if self.d_tilt_cycle_right > 0:
-                self.d_tilt_cycle_right -=1
+                self.d_tilt_cycle_right -= 1
         else:
             if self.d_tilt_cycle_left > 0:
                 self.d_tilt_cycle_left -= 1
@@ -644,11 +1163,15 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             if not self.on_ground:
                 # Cancel lag and momentum
 
-                if self.up_special_cycle_right > 0 or self.up_special_cycle_left > 0:
+                if self.up_special_cycle_right > 0 or self.up_special_cycle_left > 0 or self.side_special_cycle_right > 0 or self.side_special_cycle_left > 0:
                     if self.up_special_cycle_right > 0:
                         self.lag = self.up_special_cycle_right
-                    else:
+                    elif self.up_special_cycle_left > 0:
                         self.lag = self.up_special_cycle_left
+                    elif self.side_special_cycle_right > 0:
+                        self.lag = self.side_special_cycle_right
+                    elif self.side_special_cycle_left > 0:
+                        self.lag = self.side_special_cycle_left
                 else:
                     self.lag = 0
 
@@ -715,11 +1238,23 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             else:
                 self.image = self.hurt_image_left
         elif self.up_special_cycle_right > 0 or self.up_special_cycle_left > 0:
-            self.image_skew = (0, 0)
+            self.image_skew = self.up_special_image_skew
             if self.up_special_cycle_right > 0:
                 self.image = self.up_special_frames_right[self.up_special_cycle_right]
             elif self.up_special_cycle_left > 0:
                 self.image = self.up_special_frames_left[self.up_special_cycle_left]
+        elif self.side_special_cycle_right > 0 or self.side_special_cycle_left > 0:
+            self.image_skew = self.side_special_image_skew
+            if self.side_special_cycle_right > 0:
+                self.image = self.side_special_frames_right[self.side_special_cycle_right]
+            elif self.side_special_cycle_left > 0:
+                self.image = self.side_special_frames_left[self.side_special_cycle_left]
+        elif self.down_special_ground_cycle_right > 0 or self.down_special_ground_cycle_left > 0:
+            self.image_skew = self.down_special_ground_image_skew
+            if self.down_special_ground_cycle_right > 0:
+                self.image = self.down_special_ground_frames_right[self.down_special_ground_cycle_right]
+            elif self.down_special_ground_cycle_left > 0:
+                self.image = self.down_special_ground_frames_left[self.down_special_ground_cycle_left]
         elif self.nair_cycle_right > 0 or self.nair_cycle_left > 0:
             self.image_skew = self.nair_image_skew
             if self.nair_cycle_right > 0:
@@ -796,7 +1331,14 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.image_rect.midbottom = (self.pos.x + self.image_skew[0], self.pos.y + self.image_skew[1])
 
     def hurtboxShift(self):
-        if self.fair_cycle_right or self.fair_cycle_left:
+        if self.down_special_ground_cycle_right or self.down_special_ground_cycle_left:
+            if self.down_special_ground_cycle_right:
+                self.surf = pygame.Surface((50, 40))
+                self.rect = self.surf.get_rect(midbottom=self.pos)
+            else:
+                self.surf = pygame.Surface((50, 40))
+                self.rect = self.surf.get_rect(midbottom=self.pos)
+        elif self.fair_cycle_right or self.fair_cycle_left:
             if self.fair_cycle_right:
                 self.surf = pygame.Surface((50, 30))
                 self.rect = self.surf.get_rect(midbottom=(self.pos.x, self.pos.y - 18))
@@ -1012,11 +1554,9 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
     def upSpecial(self):
         pressed_keys = pygame.key.get_pressed()
 
-        #if self.up_special_cycle_left > 0:
-        #    print(self.up_special_cycle_left)
-
-        if self.hitconfirm:
+        if self.hitconfirm and (self.up_special_sweet.running or self.up_special_sweet.running):
             self.up_special_sweet_spot = True
+            self.up_special_sweet.count = 0
 
         if pressed_keys[self.special] and pressed_keys[self.up] and self.lag <= 0:
             self.up_special_sweet_spot = False
@@ -1048,6 +1588,50 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         if self.up_special_cycle_right == 64 or self.up_special_cycle_left == 64:
             self.vel.y = -7
 
+    def sideSpecial(self):
+        pressed_keys = pygame.key.get_pressed()
+
+        if pressed_keys[self.special] and (pressed_keys[self.right] or pressed_keys[self.left]) and self.lag <= 0:
+            self.invincibility = 32
+            self.sidespecialCycleSet()
+            if self.direction:
+                self.side_special_attack.update((self.pos.x, self.pos.y - 25))
+            else:
+                self.side_special_attack.update((self.pos.x, self.pos.y - 25))
+            self.lag = self.side_special_attack.lag
+        elif self.side_special_attack.running:
+            self.side_special_attack.update((self.pos.x, self.pos.y - 25))
+
+    def sideSpecialBoost(self):
+        if self.side_special_cycle_left == 25 or self.side_special_cycle_right == 25:
+            if self.direction:
+                self.vel.x = self.dash_speed
+            else:
+                self.vel.x = -1 * self.dash_speed
+
+    def downSpecialGround(self):
+        pressed_keys = pygame.key.get_pressed()
+
+        if pressed_keys[self.special] and pressed_keys[self.down] and self.on_ground and self.lag <= 0:
+            self.downSpecialGroundCycleSet()
+            if self.direction:
+                self.down_special_ground_attack.update((self.pos.x + 25, self.pos.y - 20))
+            else:
+                self.down_special_ground_attack.update((self.pos.x - 25, self.pos.y - 20))
+            self.lag = self.down_special_ground_attack.lag
+        elif self.down_special_ground_attack.running:
+            if self.direction:
+                self.down_special_ground_attack.update((self.pos.x + 25, self.pos.y - 20))
+            else:
+                self.down_special_ground_attack.update((self.pos.x - 25, self.pos.y - 20))
+
+    def downSpecialGroundBoost(self):
+        if self.down_special_ground_cycle_right == 19 or self.down_special_ground_cycle_left == 19:
+            if self.direction:
+                self.vel.x = self.dash_speed
+            else:
+                self.vel.x = -1 * self.dash_speed
+
     # Neutral attack
     def neutralAttack(self):
         pressed_keys = pygame.key.get_pressed()
@@ -1055,7 +1639,8 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         # If you're attacking, and you're not in attack lag
         if pressed_keys[self.attack] and self.lag <= 0:
             # If you aren't pressing any other direction
-            if not (pressed_keys[self.right] or pressed_keys[self.left] or pressed_keys[self.up] or pressed_keys[self.down]):
+            if not (pressed_keys[self.right] or pressed_keys[self.left] or pressed_keys[self.up] or pressed_keys[
+                self.down]):
                 self.nairCycleSet()
                 # Update the hitbox position
                 if self.on_ground:
@@ -1192,7 +1777,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 self.up_tilt_final.update((self.pos.x, self.pos.y - 50))
                 self.lag = self.up_tilt_final.lag
         elif self.up_tilt_final.running:
-            self.up_tilt_final.update((self.pos.x,self.pos.y - 50))
+            self.up_tilt_final.update((self.pos.x, self.pos.y - 50))
 
     # Down attack
     def downAttack(self):
@@ -1239,13 +1824,16 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             self.percentage += self.box.damage
 
             # Take the knockback of the hitbox (individual to x and y)
-            self.knockback.x = 1.5 * self.knockbackFormula(self.box.x_component, self.box.damage, self.box.knockback_scale,
-                                                     self.box.base_knockback, 1)
-            self.knockback.y = -1 * self.knockbackFormula(self.box.y_component, self.box.damage, self.box.knockback_scale,
+            self.knockback.x = 1.5 * self.knockbackFormula(self.box.x_component, self.box.damage,
+                                                           self.box.knockback_scale,
+                                                           self.box.base_knockback, 1)
+            self.knockback.y = -1 * self.knockbackFormula(self.box.y_component, self.box.damage,
+                                                          self.box.knockback_scale,
                                                           self.box.base_knockback, 1)
 
             # Set your acceleration and velocity (reset and set)
             # self.acc = vec(box.direction * self.knockback.x / 10, self.knockback.y)
+            self.acc.x = 0
             self.vel = vec(self.box.direction * self.knockback.x, self.knockback.y)
 
             # calculate the players velocity in 1D (not as a vector)
@@ -1294,6 +1882,8 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             self.countDtiltCycle()
             self.countUptiltCycle()
             self.countUpbCycle()
+            self.countSidebCycle()
+            self.countDownSpecialGroundCycle()
 
         # CONDITIONAL MOVEMENT (CONDITIONAL)
         if not (self.frozen or self.lag or self.hitstun):
@@ -1324,6 +1914,10 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 # The order of the attacks indicates their priority in activation
                 self.upSpecial()
                 self.upSpecialBoost()
+                self.sideSpecial()
+                self.sideSpecialBoost()
+                self.downSpecialGround()
+                self.downSpecialGroundBoost()
                 self.forwardAttack()
                 self.backAttack()
                 self.upAttack()
