@@ -85,6 +85,6 @@ class nameDrop:
 
     # Write the controls to the file
     def saveControls(self, controls):
-        self.names[self.name] = {0: controls[0], 1: controls[1], 2: controls[2], 3: controls[3], 4: controls[4]}
+        self.names[self.name] = {0: controls[0], 1: controls[1], 2: controls[2], 3: controls[3], 4: controls[4], 5:controls[5]}
         df = pd.DataFrame(self.names)
         df.to_csv(path+"Names/Names.csv")

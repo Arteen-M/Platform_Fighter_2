@@ -19,6 +19,7 @@ from Platform_Fighter.path import path
 # -------------------------------------------------------------------------
 # Variable Definitions
 # -------------------------------------------------------------------------
+vec = pygame.math.Vector2
 pygame.init()
 pygame.font.init()
 pygame.mixer.init()
@@ -117,6 +118,9 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
     P1HitMusic = pygame.mixer.Sound(path+"Music/HitSfX.wav")
     P2HitMusic = pygame.mixer.Sound(path+"Music/HitSfX.wav")
 
+    P1ShieldMusic = pygame.mixer.Sound(path+"Music/shield7.wav")
+    P2ShieldMusic = pygame.mixer.Sound(path + "Music/shield7.wav")
+
     # END CONDITIONS: P1 Loses, P2 Loses, Timeout
     while not (P1.end or P2.end or timerObj.time_out):
         # Event Loop
@@ -144,16 +148,41 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
         bg.update()
 
         # Update with floors, walls and hitboxes
-        P1.update(hard_floors, soft_floors, under_floors, walls, P2.active_hitboxes)
-        P2.update(hard_floors, soft_floors, under_floors, walls, P1.active_hitboxes)
+        P1.update(hard_floors, soft_floors, under_floors, walls, P2.active_hitboxes, P2.shield_box)
+        P2.update(hard_floors, soft_floors, under_floors, walls, P1.active_hitboxes, P1.shield_box)
 
         if P1.got_hit:
-            # P2HitMusic.play()
+            P2HitMusic.play()
             P2.hitconfirm = P1.hitstop
 
+        if P1.got_shield:
+            P1ShieldMusic.play()
+            xBack = abs(P1.knockbackFormula(P1.shield_hit.x_component, P1.shield_hit.damage, P1.shield_hit.knockback_scale,
+                                                     P1.shield_hit.base_knockback, 1))
+            if not P1.direction:
+                xBack *= -1
+
+            P2.vel.x = xBack
+
+            P2.hitconfirm = P1.findHitstop(P1.shield_hit.damage, 0.75)
+            P1.hitconfirm = P1.findHitstop(P1.shield_hit.damage, 0.75)
+
         if P2.got_hit:
-            # P1HitMusic.play()
+            P1HitMusic.play()
             P1.hitconfirm = P2.hitstop
+
+        if P2.got_shield:
+            P2ShieldMusic.play()
+
+            xBack = abs(P1.knockbackFormula(P2.shield_hit.x_component, P2.shield_hit.damage, P2.shield_hit.knockback_scale,
+                                                     P2.shield_hit.base_knockback, 1))
+            if not P2.direction:
+                xBack *= -1
+
+            P1.vel.x = xBack
+
+            P2.hitconfirm = P1.findHitstop(P2.shield_hit.damage, 0.75)
+            P1.hitconfirm = P1.findHitstop(P2.shield_hit.damage, 0.75)
 
         # Update the graphic with information
         P1_Graphic.update(P1.percentage, P1.stocks)

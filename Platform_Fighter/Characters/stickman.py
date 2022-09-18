@@ -7,6 +7,7 @@ from Platform_Fighter.Characters.Character_Elements import hitbox
 import math
 import time
 from Platform_Fighter.path import path
+from Platform_Fighter.Characters.Character_Elements import shield
 
 # -------------------------------------------------------------------------
 # Variable Definitions
@@ -33,7 +34,7 @@ MOMENTUM_FRIC = 0.01  # Movement Resistance during momentum
 # -------------------------------------------------------------------------
 class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
     def __init__(self, display, color=RED, spawn_position=(WIDTH / 2, HEIGHT / 2),
-                 controls=(K_LEFT, K_RIGHT, K_UP, K_DOWN, K_h), stocks=3):
+                 controls=(K_LEFT, K_RIGHT, K_UP, K_DOWN, K_h, K_q), stocks=3):
         super().__init__()
         self.surf = pygame.Surface((30, 50))  # Surface (hurtbox) size
         self.image = pygame.image.load(path+"Images/Stickman/stickman.png").convert_alpha()
@@ -77,6 +78,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.up = self.controls[2]
         self.down = self.controls[3]
         self.attack = self.controls[4]
+        self.shield = self.controls[5]
 
         # Jump variables
         self.tapped_up = False  # Detect a jump press (only once per press)
@@ -103,7 +105,16 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.momentum = 0  # Momentum (after you gain control from hitstun, but your momentum sticks around)
         self.knockback = vec(0, 0)  # Knockback Vector (x and y)
         self.got_hit = False
+        self.box = None
+        self.got_shield = False
+        self.shield_hit = None
         self.crouching = False
+
+        self.shield_box = shield.Shield()
+        # self.shield_surf = pygame.Surface((0, 0))  # 20, 60
+        # self.shield_rect = self.shield_surf.get_rect(midbottom=self.pos)
+
+        self.in_shield = False
 
         self.idle_frames_right = [pygame.image.load(path+"Images/Stickman/Idle Cycle/Idle_%d.png" % x).convert_alpha() for x in range(1, 73)]
         self.idle_cycle_right = 0
@@ -215,6 +226,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
     # Draw the current
     def draw(self):
         self.display.blit(self.surf, self.rect)
+        self.display.blit(self.shield_box.surf, self.shield_box.rect)
         self.display.blit(self.image, self.image_rect)
 
     def countHitstop(self):
@@ -499,17 +511,18 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
 
     def dash(self):
         pressed_keys = pygame.key.get_pressed()
-        if pressed_keys[self.left] and 8 >= self.pressed_left > 0:
-            self.vel.x = -1 * self.dash_speed
-            self.vel.y = 0
-        elif pressed_keys[self.left]:
-            self.pressed_left = 10
+        if not self.in_shield:
+            if pressed_keys[self.left] and 8 >= self.pressed_left > 0:
+                self.vel.x = -1 * self.dash_speed
+                self.vel.y = 0
+            elif pressed_keys[self.left]:
+                self.pressed_left = 10
 
-        if pressed_keys[self.right] and 8 >= self.pressed_right > 0:
-            self.vel.x = self.dash_speed
-            self.vel.y = 0
-        elif pressed_keys[self.right]:
-            self.pressed_right = 10
+            if pressed_keys[self.right] and 8 >= self.pressed_right > 0:
+                self.vel.x = self.dash_speed
+                self.vel.y = 0
+            elif pressed_keys[self.right]:
+                self.pressed_right = 10
 
     # def fastFall(self):
     #    if self.going_down:
@@ -711,54 +724,60 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
 
         pressed_keys = pygame.key.get_pressed()
         # If left and not hitting a wall
-        if pressed_keys[self.left] and not wall_collide:
-            # If you're on the ground
-            if self.on_ground:
-                # Increase acceleration (ground)
-                self.acc.x -= self.current_ground_acc
-                self.walkCycleSet()
+        if not self.in_shield:
+            if pressed_keys[self.left] and not wall_collide:
+                # If you're on the ground
+                if self.on_ground:
+                    # Increase acceleration (ground)
+                    self.acc.x -= self.current_ground_acc
+                    self.walkCycleSet()
+                else:
+                    # Increase acceleration (air)
+                    self.acc.x -= self.current_air_acc
+                    self.walk_cycle_left = 0
+            # If hitting left and the direction of a collided wall is not left
+            # (assuming you'll only collide with 1 wall at a time)
+            elif pressed_keys[self.left] and wall_collide[0].direction != "LEFT":
+                if self.on_ground:
+                    self.acc.x -= self.current_ground_acc
+                    self.walkCycleSet()
+                else:
+                    self.acc.x -= self.current_air_acc
+                    self.walk_cycle_left = 0
+            # if you are colliding with the wall
+            elif pressed_keys[self.left] and wall_collide:
+                # If the walls direction is left
+                if wall_collide[0].direction == "LEFT":
+                    # Stop all movement
+                    self.acc.x = 0
+                    self.vel.x = 0
             else:
-                # Increase acceleration (air)
-                self.acc.x -= self.current_air_acc
                 self.walk_cycle_left = 0
-        # If hitting left and the direction of a collided wall is not left
-        # (assuming you'll only collide with 1 wall at a time)
-        elif pressed_keys[self.left] and wall_collide[0].direction != "LEFT":
-            if self.on_ground:
-                self.acc.x -= self.current_ground_acc
-                self.walkCycleSet()
-            else:
-                self.acc.x -= self.current_air_acc
-                self.walk_cycle_left = 0
-        # if you are colliding with the wall
-        elif pressed_keys[self.left] and wall_collide:
-            # If the walls direction is left
-            if wall_collide[0].direction == "LEFT":
-                # Stop all movement
-                self.acc.x = 0
-                self.vel.x = 0
         else:
             self.walk_cycle_left = 0
 
         # Very similar to the previous if statement, but with the directions reversed
-        if pressed_keys[self.right] and not wall_collide:
-            if self.on_ground:
-                self.acc.x += self.current_ground_acc
-                self.walkCycleSet()
+        if not self.in_shield:
+            if pressed_keys[self.right] and not wall_collide:
+                if self.on_ground:
+                    self.acc.x += self.current_ground_acc
+                    self.walkCycleSet()
+                else:
+                    self.acc.x += self.current_air_acc
+                    self.walk_cycle_right = 0
+            elif pressed_keys[self.right] and not wall_collide[0].direction == "RIGHT":
+                if self.on_ground:
+                    self.acc.x += self.current_ground_acc
+                    self.walkCycleSet()
+                else:
+                    self.acc.x += self.current_air_acc
+                    self.walk_cycle_right = 0
+            elif pressed_keys[self.right] and wall_collide:
+                if wall_collide[0].direction == "RIGHT":
+                    self.acc.x = 0
+                    self.vel.x = 0
             else:
-                self.acc.x += self.current_air_acc
                 self.walk_cycle_right = 0
-        elif pressed_keys[self.right] and not wall_collide[0].direction == "RIGHT":
-            if self.on_ground:
-                self.acc.x += self.current_ground_acc
-                self.walkCycleSet()
-            else:
-                self.acc.x += self.current_air_acc
-                self.walk_cycle_right = 0
-        elif pressed_keys[self.right] and wall_collide:
-            if wall_collide[0].direction == "RIGHT":
-                self.acc.x = 0
-                self.vel.x = 0
         else:
             self.walk_cycle_right = 0
 
@@ -847,6 +866,26 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         for hitbox in self.all_hitboxes:
             if hitbox.active:
                 hitbox.draw()
+
+    def shieldPress(self):
+        pressed_keys = pygame.key.get_pressed()
+        if pressed_keys[self.shield] and self.on_ground and not self.lag and not self.hitstun:
+            self.vel.x = 0
+            self.in_shield = True
+            if self.direction:
+                self.shield_box.update((15, 60), (self.pos.x + 30, self.pos.y), True)
+            else:
+                self.shield_box.update((15, 60), (self.pos.x - 30, self.pos.y), False)
+        else:
+            self.shield_box.update((0, 0), (0, 0), None)
+            self.in_shield = False
+
+    def shieldPush(self, opponent_shield):
+        if pygame.sprite.collide_rect(self, opponent_shield):
+            if opponent_shield.direction:
+                self.acc.x = 0.5
+            else:
+                self.acc.x = -0.5
 
     # Neutral attack
     def neutralAttack(self):
@@ -1001,7 +1040,10 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         if pressed_keys[self.attack] and pressed_keys[self.down] and self.lag <= 0:
             if self.on_ground:
                 self.dtiltCycleSet()
-                self.d_tilt_attack.update(self.pos)
+                if self.direction:
+                    self.d_tilt_attack.update((self.pos.x + 10, self.pos.y - 10))
+                else:
+                    self.d_tilt_attack.update((self.pos.x - 10, self.pos.y - 10))
                 self.lag = self.d_tilt_attack.lag
             else:
                 self.dairCycleSet()
@@ -1010,47 +1052,59 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         elif self.dair_attack.running:
             self.dair_attack.update(self.pos)
         elif self.d_tilt_attack.running:
-            self.d_tilt_attack.update((self.pos.x - 10, self.pos.y - 10))
+            if self.direction:
+                self.d_tilt_attack.update((self.pos.x + 10, self.pos.y - 10))
+            else:
+                self.d_tilt_attack.update((self.pos.x - 10, self.pos.y - 10))
 
     # Detects and executes when you get hit
     def getHit(self, opponent_hitboxes):
         # A list of active hitboxes the opponent has  (Dokill = True)
+        shield_hit = pygame.sprite.spritecollide(self.shield_box, opponent_hitboxes, True)
         hit = pygame.sprite.spritecollide(self, opponent_hitboxes, True)
+
         # If one collides with you (at least 1)
-        if hit:
+        if hit and not shield_hit:
             # Only accounts for the first hitbox you get hit by
-            box = hit[0]
+            self.box = hit[0]
             self.got_hit = True
+            self.got_shield = False
 
             for x in self.all_hitboxes:
                 x.reset()
             self.active_hitboxes.empty()
 
             # Take the damage percentage of the hitbox
-            self.percentage += box.damage
+            self.percentage += self.box.damage
 
             # Take the knockback of the hitbox (individual to x and y)
-            self.knockback.x = 1.5 * self.knockbackFormula(box.x_component, box.damage, box.knockback_scale,
-                                                     box.base_knockback, 1)
-            self.knockback.y = -1 * self.knockbackFormula(box.y_component, box.damage, box.knockback_scale,
-                                                          box.base_knockback, 1)
+            self.knockback.x = 1.5 * self.knockbackFormula(self.box.x_component, self.box.damage, self.box.knockback_scale,
+                                                     self.box.base_knockback, 1)
+            self.knockback.y = -1 * self.knockbackFormula(self.box.y_component, self.box.damage, self.box.knockback_scale,
+                                                          self.box.base_knockback, 1)
 
             # Set your acceleration and velocity (reset and set)
             # self.acc = vec(box.direction * self.knockback.x / 10, self.knockback.y)
-            self.vel = vec(box.direction * self.knockback.x, self.knockback.y)
+            self.vel = vec(self.box.direction * self.knockback.x, self.knockback.y)
 
             # calculate the players velocity in 1D (not as a vector)
             velocity = math.sqrt((self.knockback.x ** 2) + (self.knockback.y ** 2))
             # Set their hitstun and momentum based on the power of the attack
-            self.hitstun = math.floor(self.hitstunFormula(velocity, box.hitstun, box.damage))
-            self.hitstop = self.findHitstop(box.damage, 0.75)
+            self.hitstun = math.floor(self.hitstunFormula(velocity, self.box.hitstun, self.box.damage))
+            self.hitstop = self.findHitstop(self.box.damage, 0.75)
             self.momentum = math.floor(self.hitstun / 2) + self.hitstun
             # self.momentum = math.floor(math.floor(self.hitstun * box.hitstun + 1) / 5)
+        elif shield_hit and not hit:
+            self.got_shield = True
+            self.got_hit = False
+            self.shield_hit = shield_hit[0]
+
         else:
+            self.got_shield = False
             self.got_hit = False
 
     # Function containing all the previous ones, to run in one cycle
-    def update(self, hard_floors, soft_floors, under_floors, walls, opponent_hitboxes):
+    def update(self, hard_floors, soft_floors, under_floors, walls, opponent_hitboxes, opponent_shield):
         # RESPAWN/END FUNCTIONS (ALWAYS)
         self.respawn()
         self.endGame()
@@ -1059,6 +1113,8 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.countHitstop()
         self.countInvincibility()
         self.countFrozen()
+
+        self.shieldPress()
 
         if not self.hitstop and not self.hitconfirm:
             self.countLag()
@@ -1097,6 +1153,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             # MOVEMENTS (CONDITIONAL)
             if not self.hitstun:
                 self.move(walls)
+                self.shieldPush(opponent_shield)
                 self.jump()
 
         if not self.frozen:
