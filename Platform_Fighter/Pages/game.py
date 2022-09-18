@@ -110,9 +110,9 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
 
     bg = background.Background(path+"Images/Background/frames/", 20, 8, display)
 
-    #musicObj = pygame.mixer.Sound(path+"Music/PlatformBanger2 (3).wav")
-    #musicObj.set_volume(0.5)
-    #musicObj.play(-1)
+    musicObj = pygame.mixer.Sound(path+"Music/PlatformBanger2 (3).wav")
+    musicObj.set_volume(0.5)
+    musicObj.play(-1)
 
     P1HitMusic = pygame.mixer.Sound(path+"Music/HitSfX.wav")
     P2HitMusic = pygame.mixer.Sound(path+"Music/HitSfX.wav")
@@ -148,11 +148,11 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
         P2.update(hard_floors, soft_floors, under_floors, walls, P1.active_hitboxes)
 
         if P1.got_hit:
-            P2HitMusic.play()
+            # P2HitMusic.play()
             P2.hitconfirm = P1.hitstop
 
         if P2.got_hit:
-            P1HitMusic.play()
+            # P1HitMusic.play()
             P1.hitconfirm = P2.hitstop
 
         # Update the graphic with information

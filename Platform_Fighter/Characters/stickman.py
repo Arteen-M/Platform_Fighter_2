@@ -103,6 +103,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.momentum = 0  # Momentum (after you gain control from hitstun, but your momentum sticks around)
         self.knockback = vec(0, 0)  # Knockback Vector (x and y)
         self.got_hit = False
+        self.crouching = False
 
         self.idle_frames_right = [pygame.image.load(path+"Images/Stickman/Idle Cycle/Idle_%d.png" % x).convert_alpha() for x in range(1, 73)]
         self.idle_cycle_right = 0
@@ -122,11 +123,17 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.f_tilt_frames_left = [pygame.transform.flip(pygame.image.load(path + "Images/Stickman/Forward Tilt/stick_char_ftilt-%d.png" % (15 - x // 2)), True, False).convert_alpha() for x in range(2, 29)]
         self.f_tilt_cycle_left = 0
 
-        self.d_tilt_frames_right = [pygame.image.load(path+"Images/Stickman/Down Tilt/stick_char_dtilt-%d.png" % (x // 2)).convert_alpha() for x in range(2, 12)]
+        self.d_tilt_frames_right = [pygame.image.load(path+"Images/Stickman/Down Tilt/stick_char_dtilt-%d.png" % (7 - x // 2)).convert_alpha() for x in range(2, 12)]
         self.d_tilt_cycle_right = 0
 
-        self.d_tilt_frames_left = [pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Down Tilt/stick_char_dtilt-%d.png" % (x // 2)), True, False).convert_alpha() for x in range(2, 12)]
+        self.d_tilt_frames_left = [pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Down Tilt/stick_char_dtilt-%d.png" % (7 - x // 2)), True, False).convert_alpha() for x in range(2, 12)]
         self.d_tilt_cycle_left = 0
+
+        self.up_tilt_frames_right = [pygame.image.load(path+"Images/Stickman/Up Tilt/stick_char_uptilt-%d.png" % (19 - x // 2)).convert_alpha() for x in range(2, 36)]
+        self.up_tilt_cycle_right = 0
+
+        self.up_tilt_frames_left = [pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Up Tilt/stick_char_uptilt-%d.png" % (19 - x // 2)), True, False).convert_alpha() for x in range(2, 36)]
+        self.up_tilt_cycle_left = 0
 
         self.nair_frames_right = [pygame.image.load(path+"Images/Stickman/Neutral Air/Nair_%d.png" % x).convert_alpha() for x in range(0, 28)]
         self.nair_cycle_right = 0
@@ -164,29 +171,40 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.hurt_image_right = pygame.image.load(path+"Images/Stickman/Hitstun/stick_char_hitstun-1.png").convert_alpha()
         self.hurt_image_left = pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Hitstun/stick_char_hitstun-1.png"), True, False).convert_alpha()
 
+        self.crouch_image_right = pygame.image.load(path+"Images/Stickman/Crouch/stick_char_crouch-2.png").convert_alpha()
+        self.crouch_image_left = pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Crouch/stick_char_crouch-2.png"), True, False).convert_alpha()
+
         self.nair_image_skew = (0, 25)
         self.fair_image_skew = (0, 15)
         self.up_air_image_skew = (0, 0)
         self.dair_image_skew = (0, 0)
         self.bair_image_skew = (0, 0)
         self.f_tilt_image_skew = (0, 0)
+        self.d_tilt_image_skew = (0, 0)
+        self.up_tilt_image_skew = (0, 0)
+        self.crouch_image_skew = (0, 0)
 
         self.nair_count = 0  # MAX IS 4
 
         # Hitboxes for each usable attack
         #                                name      size       display   lag  sf  ef dir  angle    dmg b  s  hitstun  color
-        self.ng_attack = hitbox.HitBox("Neutral", (60, 30), self.display, 28, 24, 2, 1, (0.5, 0.5), 5, 1, 0.2, 5, self.color)
-        self.nair_attack1 = hitbox.HitBox("Neutral", (60, 30), self.display, 10, 6, 2, 1, (0, 0.5), 1, 1, 0.2, 5, self.color)
-        self.nair_attack2 = hitbox.HitBox("Neutral", (60, 30), self.display, 10, 6, 2, 1, (0.1, 0.1), 1, 1, 0.2, 5, self.color)
-        self.nair_final = hitbox.HitBox("Neutral", (60, 30), self.display, 16, 8, 1, 1, (0.5, 0.5), 5, 1, 0.2, 5, self.color)
-        self.f_tilt_attack = hitbox.HitBox("Forward", (40, 20), self.display, 28, 14, 8, 1, (0.6, 0.4), 7, 1.5, 0.2, 3, self.color)
-        self.f_air_attack = hitbox.HitBox("Forward", (60, 30), self.display, 28, 24, 18, 1, (0.6, 0.4), 7, 1.5, 0.2, 3, self.color)
-        self.b_attack = hitbox.HitBox("Back", (30, 20), self.display, 28, 10, 4, 1, (-0.65, 0.35), 8, 1, 0.2, 3, self.color)
-        self.u_air_attack = hitbox.HitBox("Up", (40, 40), self.display, 16, 10, 5, 1, (0.15, 0.7), 4, 1.2, 0.3, 5, self.color)
-        self.dair_attack = hitbox.HitBox("Down", (40, 30), self.display, 20, 15, 5, 1, (0.05, -0.6), 10, 1.5, 0.3, 5, self.color)
+        self.ng_attack = hitbox.HitBox("Neutral", (60, 30), self.display, 28, 24, 2, 1, (0.5, 0.5), 5, 1, 0.2, 10, self.color)
+        self.nair_attack1 = hitbox.HitBox("Neutral", (60, 30), self.display, 10, 6, 2, 1, (0, 0.5), 1, 1, 0.2, 10, self.color)
+        self.nair_attack2 = hitbox.HitBox("Neutral", (60, 30), self.display, 10, 6, 2, 1, (0.1, 0.1), 1, 1, 0.2, 10, self.color)
+        self.nair_final = hitbox.HitBox("Neutral", (60, 30), self.display, 16, 8, 1, 1, (0.5, 0.5), 5, 1, 0.2, 10, self.color)
+        self.f_tilt_attack = hitbox.HitBox("Forward", (40, 20), self.display, 28, 14, 8, 1, (0.6, 0.4), 7, 1.5, 0.2, 10, self.color)
+        self.f_air_attack = hitbox.HitBox("Forward", (60, 30), self.display, 28, 24, 18, 1, (0.6, 0.4), 7, 1.5, 0.2, 10, self.color)
+        self.b_attack = hitbox.HitBox("Back", (30, 20), self.display, 28, 10, 4, 1, (-0.65, 0.35), 8, 1, 0.2, 10, self.color)
+        self.up_tilt_attack1 = hitbox.HitBox("Up", (30, 30), self.display, 20, 14, 10, 1, (-0.5, 0.5), 5, 5, 0, 10, self.color)
+        self.up_tilt_attack2 = hitbox.HitBox("Up", (30, 30), self.display, 20, 14, 10, 1, (0.5, 0.5), 5, 5, 0, 10, self.color)
+        self.up_tilt_final = hitbox.HitBox("Up", (15, 50), self.display, 16, 15, 5, 1, (0, 1), 4, 1.2, 0.3, 10, self.color)
+        self.u_air_attack = hitbox.HitBox("Up", (40, 40), self.display, 16, 10, 5, 1, (0.15, 0.7), 4, 1.2, 0.3, 10, self.color)
+        self.d_tilt_attack = hitbox.HitBox("Down", (30, 20), self.display, 12, 4, 1, 1, (0.35, 0.65), 3, 2, 0.1, 10, self.color)
+        self.dair_attack = hitbox.HitBox("Down", (40, 30), self.display, 20, 15, 5, 1, (0.05, -0.6), 10, 1.5, 0.3, 10, self.color)
+
 
         # Hitbox groups
-        self.all_hitboxes = [self.ng_attack, self.nair_attack1, self.nair_attack2, self.nair_final, self.f_tilt_attack, self.f_air_attack, self.b_attack, self.u_air_attack, self.dair_attack]
+        self.all_hitboxes = [self.ng_attack, self.nair_attack1, self.nair_attack2, self.nair_final, self.f_tilt_attack, self.f_air_attack, self.b_attack, self.u_air_attack, self.up_tilt_attack1, self.up_tilt_attack2, self.up_tilt_final, self.d_tilt_attack, self.dair_attack]
         self.active_hitboxes = pygame.sprite.Group()
 
         self.image_skew = (0, 0)
@@ -305,6 +323,22 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         else:
             if self.d_tilt_cycle_left > 0:
                 self.d_tilt_cycle_left -= 1
+
+    def uptiltCycleSet(self):
+        if self.direction:
+            if self.up_tilt_cycle_right == 0:
+                self.up_tilt_cycle_right = len(self.up_tilt_frames_right) - 1
+        else:
+            if self.up_tilt_cycle_left == 0:
+                self.up_tilt_cycle_left = len(self.up_tilt_frames_left) - 1
+
+    def countUptiltCycle(self):
+        if self.direction:
+            if self.up_tilt_cycle_right > 0:
+                self.up_tilt_cycle_right -= 1
+        else:
+            if self.up_tilt_cycle_left > 0:
+                self.up_tilt_cycle_left -= 1
 
     def nairCycleSet(self):
         if self.direction:
@@ -493,8 +527,6 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 self.lag = 0
                 self.momentum = 0
 
-                self.f_tilt_cycle_right = 0
-                self.f_tilt_cycle_left = 0
                 self.nair_cycle_right = 0
                 self.nair_cycle_left = 0
                 self.fair_cycle_right = 0
@@ -588,7 +620,19 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             if self.f_tilt_cycle_right > 0:
                 self.image = self.f_tilt_frames_right[self.f_tilt_cycle_right]
             elif self.f_tilt_cycle_left > 0:
-                self.image =  self.f_tilt_frames_left[self.f_tilt_cycle_left]
+                self.image = self.f_tilt_frames_left[self.f_tilt_cycle_left]
+        elif self.d_tilt_cycle_right > 0 or self.d_tilt_cycle_left > 0:
+            self.image_skew = self.d_tilt_image_skew
+            if self.d_tilt_cycle_right > 0:
+                self.image = self.d_tilt_frames_right[self.d_tilt_cycle_right]
+            elif self.d_tilt_cycle_left > 0:
+                self.image = self.d_tilt_frames_left[self.d_tilt_cycle_left]
+        elif self.up_tilt_cycle_right > 0 or self.up_tilt_cycle_left > 0:
+            self.image_skew = self.up_tilt_image_skew
+            if self.up_tilt_cycle_right > 0:
+                self.image = self.up_tilt_frames_right[self.up_tilt_cycle_right]
+            elif self.up_tilt_cycle_left > 0:
+                self.image = self.up_tilt_frames_left[self.up_tilt_cycle_left]
         elif self.walk_cycle_right > 0 or self.walk_cycle_left > 0:
             self.image_skew = (0, 0)
             if self.walk_cycle_right > 0:
@@ -601,6 +645,11 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 self.image = self.air_image_right
             else:
                 self.image = self.air_image_left
+        elif self.crouching:
+            if self.direction:
+                self.image = self.crouch_image_right
+            else:
+                self.image = self.crouch_image_left
         else:
             self.image_skew = (0, 0)
             self.idleCycleSet()
@@ -619,11 +668,22 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             else:
                 self.surf = pygame.Surface((50, 30))
                 self.rect = self.surf.get_rect(midbottom=(self.pos.x, self.pos.y - 18))
+        elif self.crouching:
+            self.surf = pygame.Surface((30, 40))
+            self.rect = self.surf.get_rect(midbottom=self.pos)
         else:
             self.surf = pygame.Surface((30, 50))
             self.rect = self.surf.get_rect(midbottom=self.pos)
 
         self.surf.fill(self.color)
+
+    def crouch(self):
+        pressed_keys = pygame.key.get_pressed()
+
+        if not self.lag and pressed_keys[self.down] and self.on_ground:
+            self.crouching = True
+        else:
+            self.crouching = False
 
     # Horizontal Movements
     def move(self, walls):
@@ -905,13 +965,34 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         # If you're attacking, and you're not in attack lag
         if pressed_keys[self.attack] and pressed_keys[self.up] and self.lag <= 0:
             if self.on_ground:
-                pass
+                self.uptiltCycleSet()
+                if self.direction:
+                    self.up_tilt_attack1.update((self.pos.x + 30, self.pos.y - 15))
+                    self.up_tilt_attack2.update((self.pos.x - 30, self.pos.y - 15))
+                else:
+                    self.up_tilt_attack1.update((self.pos.x - 30, self.pos.y - 15))
+                    self.up_tilt_attack2.update((self.pos.x + 30, self.pos.y - 15))
+                self.lag = self.up_tilt_attack1.lag
+
             else:
                 self.uairCycleSet()
                 self.u_air_attack.update((self.pos.x, self.pos.y - 40))
                 self.lag = self.u_air_attack.lag
         elif self.u_air_attack.running:
             self.u_air_attack.update((self.pos.x, self.pos.y - 40))
+        elif self.up_tilt_attack1.running and self.up_tilt_attack2.running:
+            if self.direction:
+                self.up_tilt_attack1.update((self.pos.x + 30, self.pos.y - 15))
+                self.up_tilt_attack2.update((self.pos.x - 30, self.pos.y - 15))
+            else:
+                self.up_tilt_attack1.update((self.pos.x - 30, self.pos.y - 15))
+                self.up_tilt_attack2.update((self.pos.x + 30, self.pos.y - 15))
+
+            if self.up_tilt_attack1.count == 1:
+                self.up_tilt_final.update((self.pos.x, self.pos.y - 50))
+                self.lag = self.up_tilt_final.lag
+        elif self.up_tilt_final.running:
+            self.up_tilt_final.update((self.pos.x,self.pos.y - 50))
 
     # Down attack
     def downAttack(self):
@@ -919,13 +1000,17 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
 
         if pressed_keys[self.attack] and pressed_keys[self.down] and self.lag <= 0:
             if self.on_ground:
-                pass
+                self.dtiltCycleSet()
+                self.d_tilt_attack.update(self.pos)
+                self.lag = self.d_tilt_attack.lag
             else:
                 self.dairCycleSet()
                 self.dair_attack.update(self.pos)
                 self.lag = self.dair_attack.lag
         elif self.dair_attack.running:
             self.dair_attack.update(self.pos)
+        elif self.d_tilt_attack.running:
+            self.d_tilt_attack.update((self.pos.x - 10, self.pos.y - 10))
 
     # Detects and executes when you get hit
     def getHit(self, opponent_hitboxes):
@@ -945,13 +1030,13 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             self.percentage += box.damage
 
             # Take the knockback of the hitbox (individual to x and y)
-            self.knockback.x = self.knockbackFormula(box.x_component, box.damage, box.knockback_scale,
+            self.knockback.x = 1.5 * self.knockbackFormula(box.x_component, box.damage, box.knockback_scale,
                                                      box.base_knockback, 1)
             self.knockback.y = -1 * self.knockbackFormula(box.y_component, box.damage, box.knockback_scale,
                                                           box.base_knockback, 1)
 
             # Set your acceleration and velocity (reset and set)
-            self.acc = vec(box.direction * self.knockback.x / 10, self.knockback.y)
+            # self.acc = vec(box.direction * self.knockback.x / 10, self.knockback.y)
             self.vel = vec(box.direction * self.knockback.x, self.knockback.y)
 
             # calculate the players velocity in 1D (not as a vector)
@@ -959,7 +1044,8 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             # Set their hitstun and momentum based on the power of the attack
             self.hitstun = math.floor(self.hitstunFormula(velocity, box.hitstun, box.damage))
             self.hitstop = self.findHitstop(box.damage, 0.75)
-            self.momentum = math.floor(self.hitstun * math.ceil(box.hitstun) + 1)
+            self.momentum = math.floor(self.hitstun / 2) + self.hitstun
+            # self.momentum = math.floor(math.floor(self.hitstun * box.hitstun + 1) / 5)
         else:
             self.got_hit = False
 
@@ -973,6 +1059,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.countHitstop()
         self.countInvincibility()
         self.countFrozen()
+
         if not self.hitstop and not self.hitconfirm:
             self.countLag()
             self.countHitstun()
@@ -987,6 +1074,8 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             self.countDairCycle()
             self.countBairCycle()
             self.countFtiltCycle()
+            self.countDtiltCycle()
+            self.countUptiltCycle()
 
         # CONDITIONAL MOVEMENT (CONDITIONAL)
         if not (self.frozen or self.lag or self.hitstun):
@@ -1004,6 +1093,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             self.stateChange(hard_floors)
             if not (self.lag or self.hitstun):
                 self.directionChange()
+                self.crouch()
             # MOVEMENTS (CONDITIONAL)
             if not self.hitstun:
                 self.move(walls)
