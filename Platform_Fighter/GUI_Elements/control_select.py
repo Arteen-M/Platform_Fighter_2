@@ -82,7 +82,7 @@ class controlButton:
 
 # Bunch of buttons arranged specifically
 class controlPanel:
-    def __init__(self, display, controls=(K_LEFT, K_RIGHT, K_UP, K_DOWN, K_h, K_q), pos=(WIDTH/2, HEIGHT/2)):
+    def __init__(self, display, controls=(K_LEFT, K_RIGHT, K_UP, K_DOWN, K_h, K_q, K_e), pos=(WIDTH/2, HEIGHT/2)):
         self.controls = controls
         self.pos = pos
         self.display = display
@@ -90,8 +90,9 @@ class controlPanel:
         self.right = controlButton(">", self.controls[1], (self.pos[0] + 60, self.pos[1] + 50), self.display)
         self.up = controlButton("^", self.controls[2], (self.pos[0], self.pos[1] - 50), self.display)
         self.down = controlButton("v", self.controls[3], (self.pos[0], self.pos[1] + 50), self.display)
-        self.attack = controlButton("Atk", self.controls[4], (self.pos[0] + 60, self.pos[1] - 50), self.display, bigSize=30)
+        self.attack = controlButton("Atk", self.controls[4], (self.pos[0] + 120, self.pos[1] - 50), self.display, bigSize=30)
         self.shield = controlButton("Shd", self.controls[5], (self.pos[0] - 60, self.pos[1] - 50), self.display, bigSize=30)
+        self.special = controlButton("Spe", self.controls[6], (self.pos[0] + 60, self.pos[1] - 50), self.display, bigSize=30)
 
     def update(self):
         self.left.update()
@@ -100,6 +101,7 @@ class controlPanel:
         self.up.update()
         self.attack.update()
         self.shield.update()
+        self.special.update()
 
     def get_pressed(self, click):
         self.left.get_pressed(click)
@@ -108,6 +110,7 @@ class controlPanel:
         self.up.get_pressed(click)
         self.attack.get_pressed(click)
         self.shield.get_pressed(click)
+        self.special.get_pressed(click)
 
     # Changing the entire control scheme at once (new name)
     def reInit(self, controls):
@@ -116,8 +119,9 @@ class controlPanel:
         self.right = controlButton(">", self.controls[1], (self.pos[0] + 60, self.pos[1] + 50), self.display)
         self.up = controlButton("^", self.controls[2], (self.pos[0], self.pos[1] - 50), self.display)
         self.down = controlButton("v", self.controls[3], (self.pos[0], self.pos[1] + 50), self.display)
-        self.attack = controlButton("Atk", self.controls[4], (self.pos[0] + 60, self.pos[1] - 50), self.display, bigSize=30)
+        self.attack = controlButton("Atk", self.controls[4], (self.pos[0] + 120, self.pos[1] - 50), self.display, bigSize=30)
         self.shield = controlButton("Shd", self.controls[5], (self.pos[0] - 60, self.pos[1] - 50), self.display, bigSize=30)
+        self.special = controlButton("Spe", self.controls[6], (self.pos[0] + 60, self.pos[1] - 50), self.display, bigSize=30)
 
     def returnControls(self):
-        return [self.left.control, self.right.control, self.up.control, self.down.control, self.attack.control, self.shield.control]
+        return [self.left.control, self.right.control, self.up.control, self.down.control, self.attack.control, self.shield.control, self.special.control]

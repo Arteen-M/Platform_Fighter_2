@@ -34,7 +34,7 @@ MOMENTUM_FRIC = 0.01  # Movement Resistance during momentum
 # -------------------------------------------------------------------------
 class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
     def __init__(self, display, color=RED, spawn_position=(WIDTH / 2, HEIGHT / 2),
-                 controls=(K_LEFT, K_RIGHT, K_UP, K_DOWN, K_h, K_q), stocks=3):
+                 controls=(K_LEFT, K_RIGHT, K_UP, K_DOWN, K_h, K_q, K_e), stocks=3):
         super().__init__()
         self.surf = pygame.Surface((30, 50))  # Surface (hurtbox) size
         self.image = pygame.image.load(path+"Images/Stickman/stickman.png").convert_alpha()
@@ -79,6 +79,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.down = self.controls[3]
         self.attack = self.controls[4]
         self.shield = self.controls[5]
+        self.special = self.controls[6]
 
         # Jump variables
         self.tapped_up = False  # Detect a jump press (only once per press)
@@ -111,8 +112,6 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.crouching = False
 
         self.shield_box = shield.Shield()
-        # self.shield_surf = pygame.Surface((0, 0))  # 20, 60
-        # self.shield_rect = self.shield_surf.get_rect(midbottom=self.pos)
 
         self.in_shield = False
 
@@ -127,6 +126,95 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
 
         self.walk_frames_left = [pygame.transform.flip(pygame.image.load(path+"Images/Stickman/Walk Cycle/Walk_%d.png" % x), True, False).convert_alpha() for x in range(1, 17)]
         self.walk_cycle_left = 0
+
+        self.up_special_frames = [pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_0.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_1.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_2.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_3.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_4.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_5.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_6.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_7.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_8.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_9.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_10.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_11.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_12.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_13.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_14.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_15.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_16.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_17.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_18.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_18.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_19.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_19.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_20.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_20.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_21.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_21.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_22.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_22.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_23.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_23.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_24.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_24.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_25.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_25.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_26.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_26.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_27.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_27.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_28.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_28.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_29.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_29.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_30.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_30.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_31.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_31.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_32.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_32.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha(),
+                                 pygame.image.load(path+"Images/Stickman/Up Special/Up_Special_33.png").convert_alpha()]
+
+        self.up_special_frames_right = []
+        for x in range(len(self.up_special_frames)-1, -1, -1):
+            self.up_special_frames_right.append(self.up_special_frames[x])
+        self.up_special_cycle_right = 0
+
+        self.up_special_frames_left = []
+        for x in range(len(self.up_special_frames)-1, -1, -1):
+            self.up_special_frames_left.append(pygame.transform.flip(self.up_special_frames[x], True, False))
+
+        self.up_special_cycle_left = 0
 
         self.f_tilt_frames_right = [pygame.image.load(path+"Images/Stickman/Forward Tilt/stick_char_ftilt-%d.png" % (15 - x // 2)).convert_alpha() for x in range(2, 29)]
         self.f_tilt_cycle_right = 0
@@ -196,6 +284,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.crouch_image_skew = (0, 0)
 
         self.nair_count = 0  # MAX IS 4
+        self.up_special_sweet_spot = False
 
         # Hitboxes for each usable attack
         #                                name      size       display   lag  sf  ef dir  angle    dmg b  s  hitstun  color
@@ -212,10 +301,11 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.u_air_attack = hitbox.HitBox("Up", (40, 40), self.display, 16, 10, 5, 1, (0.15, 0.7), 4, 1.2, 0.3, 10, self.color)
         self.d_tilt_attack = hitbox.HitBox("Down", (30, 20), self.display, 12, 4, 1, 1, (0.35, 0.65), 3, 2, 0.1, 10, self.color)
         self.dair_attack = hitbox.HitBox("Down", (40, 30), self.display, 20, 15, 5, 1, (0.05, -0.6), 10, 1.5, 0.3, 10, self.color)
-
+        self.up_special_sweet = hitbox.HitBox("Up", (30, 25), self.display, 13, 4, 1, 1, (0.1, 0.9), 10, 4, 0.3, 15, self.color)
+        self.up_special_sour = hitbox.HitBox("Up", (20, 60), self.display, 64, 63, 43, 1, (0.3, 0.7), 5, 0.2, 0.2, 5, self.color)
 
         # Hitbox groups
-        self.all_hitboxes = [self.ng_attack, self.nair_attack1, self.nair_attack2, self.nair_final, self.f_tilt_attack, self.f_air_attack, self.b_attack, self.u_air_attack, self.up_tilt_attack1, self.up_tilt_attack2, self.up_tilt_final, self.d_tilt_attack, self.dair_attack]
+        self.all_hitboxes = [self.ng_attack, self.nair_attack1, self.nair_attack2, self.nair_final, self.f_tilt_attack, self.f_air_attack, self.b_attack, self.u_air_attack, self.up_tilt_attack1, self.up_tilt_attack2, self.up_tilt_final, self.d_tilt_attack, self.dair_attack, self.up_special_sweet, self.up_special_sour]
         self.active_hitboxes = pygame.sprite.Group()
 
         self.image_skew = (0, 0)
@@ -303,6 +393,22 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                     self.idle_cycle_left = len(self.idle_frames_left) - 1
                 else:
                     self.idle_cycle_left -= 1
+
+    def upspecialCycleSet(self):
+        if self.direction:
+            if self.up_special_cycle_right == 0:
+                self.up_special_cycle_right = len(self.up_special_frames_right) - 1
+        else:
+            if self.up_special_cycle_left == 0:
+                self.up_special_cycle_left = len(self.up_special_frames_left) - 1
+
+    def countUpbCycle(self):
+        if self.direction:
+            if self.up_special_cycle_right > 0:
+                self.up_special_cycle_right -= 1
+        else:
+            if self.up_special_cycle_left > 0:
+                self.up_special_cycle_left -= 1
 
     def ftiltCycleSet(self):
         if self.direction:
@@ -537,19 +643,27 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             # If you hit the ground and weren't on the ground before
             if not self.on_ground:
                 # Cancel lag and momentum
-                self.lag = 0
-                self.momentum = 0
 
-                self.nair_cycle_right = 0
-                self.nair_cycle_left = 0
-                self.fair_cycle_right = 0
-                self.fair_cycle_left = 0
-                self.up_air_cycle_right = 0
-                self.up_air_cycle_left = 0
-                self.dair_cycle_right = 0
-                self.dair_cycle_left = 0
-                self.bair_cycle_right = 0
-                self.bair_cycle_left = 0
+                if self.up_special_cycle_right > 0 or self.up_special_cycle_left > 0:
+                    if self.up_special_cycle_right > 0:
+                        self.lag = self.up_special_cycle_right
+                    else:
+                        self.lag = self.up_special_cycle_left
+                else:
+                    self.lag = 0
+
+                    self.nair_cycle_right = 0
+                    self.nair_cycle_left = 0
+                    self.fair_cycle_right = 0
+                    self.fair_cycle_left = 0
+                    self.up_air_cycle_right = 0
+                    self.up_air_cycle_left = 0
+                    self.dair_cycle_right = 0
+                    self.dair_cycle_left = 0
+                    self.bair_cycle_right = 0
+                    self.bair_cycle_left = 0
+
+                self.momentum = 0
 
                 self.going_down = False
                 # Reset any hitboxes
@@ -566,14 +680,16 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             # If you're on the ground then fall off
             if self.on_ground:
                 # Cancel lag
-                self.lag = 0
                 # Reset any hitboxes
-                for hitbox in self.all_hitboxes:
-                    if self.active_hitboxes.has(hitbox):
-                        self.active_hitboxes.remove(hitbox)
-                        hitbox.reset()
-                    if hitbox.running:
-                        hitbox.reset()
+                if self.up_special_cycle_right <= 0 and self.up_special_cycle_left <= 0:
+                    self.lag = 0
+
+                    for hitbox in self.all_hitboxes:
+                        if self.active_hitboxes.has(hitbox):
+                            self.active_hitboxes.remove(hitbox)
+                            hitbox.reset()
+                        if hitbox.running:
+                            hitbox.reset()
 
             # You are now not on the ground
             self.on_ground = False
@@ -598,6 +714,12 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 self.image = self.hurt_image_right
             else:
                 self.image = self.hurt_image_left
+        elif self.up_special_cycle_right > 0 or self.up_special_cycle_left > 0:
+            self.image_skew = (0, 0)
+            if self.up_special_cycle_right > 0:
+                self.image = self.up_special_frames_right[self.up_special_cycle_right]
+            elif self.up_special_cycle_left > 0:
+                self.image = self.up_special_frames_left[self.up_special_cycle_left]
         elif self.nair_cycle_right > 0 or self.nair_cycle_left > 0:
             self.image_skew = self.nair_image_skew
             if self.nair_cycle_right > 0:
@@ -887,6 +1009,45 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             else:
                 self.acc.x = -0.5
 
+    def upSpecial(self):
+        pressed_keys = pygame.key.get_pressed()
+
+        #if self.up_special_cycle_left > 0:
+        #    print(self.up_special_cycle_left)
+
+        if self.hitconfirm:
+            self.up_special_sweet_spot = True
+
+        if pressed_keys[self.special] and pressed_keys[self.up] and self.lag <= 0:
+            self.up_special_sweet_spot = False
+            self.upspecialCycleSet()
+            if self.direction:
+                self.up_special_sweet.update((self.pos.x + 30, self.pos.y - 10))
+            else:
+                self.up_special_sweet.update((self.pos.x - 30, self.pos.y - 10))
+            self.lag = self.up_special_sweet.lag
+        elif self.up_special_sweet.running:
+            if self.direction:
+                self.up_special_sweet.update((self.pos.x + 30, self.pos.y - 10))
+            else:
+                self.up_special_sweet.update((self.pos.x - 30, self.pos.y - 10))
+
+            if self.up_special_sweet.count == 1 and not self.up_special_sweet_spot:
+                if self.direction:
+                    self.up_special_sour.update((self.pos.x + 30, self.pos.y - 30))
+                else:
+                    self.up_special_sour.update((self.pos.x - 30, self.pos.y - 30))
+                self.lag = self.up_special_sour.lag
+        elif self.up_special_sour.running:
+            if self.direction:
+                self.up_special_sour.update((self.pos.x + 30, self.pos.y - 30))
+            else:
+                self.up_special_sour.update((self.pos.x - 30, self.pos.y - 30))
+
+    def upSpecialBoost(self):
+        if self.up_special_cycle_right == 64 or self.up_special_cycle_left == 64:
+            self.vel.y = -7
+
     # Neutral attack
     def neutralAttack(self):
         pressed_keys = pygame.key.get_pressed()
@@ -1132,6 +1293,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             self.countFtiltCycle()
             self.countDtiltCycle()
             self.countUptiltCycle()
+            self.countUpbCycle()
 
         # CONDITIONAL MOVEMENT (CONDITIONAL)
         if not (self.frozen or self.lag or self.hitstun):
@@ -1160,6 +1322,8 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             if not self.hitstun:
                 # ATTACKS (CONDITIONAL)
                 # The order of the attacks indicates their priority in activation
+                self.upSpecial()
+                self.upSpecialBoost()
                 self.forwardAttack()
                 self.backAttack()
                 self.upAttack()
