@@ -87,3 +87,33 @@ class HitBox(pygame.sprite.Sprite):
         self.count = self._lag
         self._active = False
         self.running = False
+
+
+class Projectile(pygame.sprite.Sprite):
+    def __init__(self, path, total_frames, display, set_speed=10):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load(path).convert_alpha()
+        self.image_rect = self.image.get_rect(midbottom=(0, 0))
+        self.speed = set_speed
+        self.total_frames = total_frames
+        self.frames = 0
+        self.pos = [0, 0]
+        self.display = display
+        self.running = False
+
+    def start(self, pos_x, pos_y):
+        self.pos = [pos_x, pos_y]
+        self.frames = 0
+        self.running = True
+
+    def update(self):
+        if self.running:
+            self.pos[0] += self.speed
+            self.frames += 1
+            self.image_rect = self.image.get_rect(midbottom=(self.pos[0] + self.speed, self.pos[1]))
+            self.display.blit(self.image, self.image_rect)
+
+        if self.frames >= self.total_frames:
+            self.running = False
+
+

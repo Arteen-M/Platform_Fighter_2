@@ -153,7 +153,8 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
 
         if P1.got_hit:
             P2HitMusic.play()
-            P2.hitconfirm = P1.hitstop
+            if P1.box.name != "Projectile":
+                P2.hitconfirm = P1.hitstop
 
         if P1.got_shield:
             P1ShieldMusic.play()
@@ -169,7 +170,8 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
 
         if P2.got_hit:
             P1HitMusic.play()
-            P1.hitconfirm = P2.hitstop
+            if P2.box.name != "Projectile":
+                P1.hitconfirm = P2.hitstop
 
         if P2.got_shield:
             P2ShieldMusic.play()

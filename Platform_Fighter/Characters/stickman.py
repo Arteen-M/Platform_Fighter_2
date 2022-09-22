@@ -4,10 +4,10 @@
 import pygame
 from pygame.locals import *
 from Platform_Fighter.Characters.Character_Elements import hitbox
+from Platform_Fighter.Characters.Character_Elements import shield
 import math
 import time
 from Platform_Fighter.path import path
-from Platform_Fighter.Characters.Character_Elements import shield
 
 # -------------------------------------------------------------------------
 # Variable Definitions
@@ -134,6 +134,116 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             pygame.transform.flip(pygame.image.load(path + "Images/Stickman/Walk Cycle/Walk_%d.png" % x), True,
                                   False).convert_alpha() for x in range(1, 17)]
         self.walk_cycle_left = 0
+
+        self.neutral_special_frames = [pygame.image.load(
+            path + "Images/Stickman/Neutral Special/Neutral_B_0.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_0.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_1.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_1.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_2.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_2.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_3.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_3.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_4.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_4.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_5.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_5.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_6.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_6.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_7.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_7.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_8.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_8.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_9.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_9.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_10.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_10.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_11.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_11.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_12.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_12.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_14.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_14.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_14.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_14.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_14.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_14.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_14.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_14.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_14.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_14.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_14.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_14.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_14.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_14.png").convert_alpha(),
+                                       pygame.image.load(
+                                           path + "Images/Stickman/Neutral Special/Neutral_B_14.png").convert_alpha()]
+
+        self.neutral_special_frames_right = []
+        for x in range(len(self.neutral_special_frames) - 1, -1, -1):
+            self.neutral_special_frames_right.append(self.neutral_special_frames[x])
+
+        self.neutral_special_cycle_right = 0
+
+        self.neutral_special_frames_left = []
+        for x in range(len(self.neutral_special_frames) - 1, -1, -1):
+            self.neutral_special_frames_left.append(pygame.transform.flip(self.neutral_special_frames[x], True, False))
+
+        self.neutral_special_cycle_left = 0
+
+        self.fireball_right = hitbox.Projectile(path + "Images/Stickman/Neutral Special/Neutral_B_Projectile.png", 60,
+                                                self.display, 5)
+        self.fireball_left = hitbox.Projectile(path + "Images/Stickman/Neutral Special/Neutral_B_Projectile_reverse.png",
+                                               60, self.display, -5)
+
+        # self.fireball_hitbox = (30, 25)
+        self.fireball_frames = 80
+        self.fireball_start_flag = 79
+        self.fireball_end_flag = 19
+        self.fireball_angle = (1, 0)
+        self.fireball_dmg = 20
+        self.fireball_base = 2.5
+        self.fireball_scale = 0
+        self.fireball_hitstun = 15
 
         self.up_special_frames = [
             pygame.image.load(path + "Images/Stickman/Up Special/Up_Special_0.png").convert_alpha(),
@@ -696,6 +806,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.side_special_image_skew = (0, 0)
         self.down_special_ground_image_skew = (0, 0)
         self.down_special_air_image_skew = (0, 0)
+        self.neutral_special_image_skew = (0, 0)
 
         self.up_special_sweet_spot = False
 
@@ -805,12 +916,33 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                                                      self.down_special_air_hitstun,
                                                      self.color)
 
+        self.fireball_right_attack = hitbox.HitBox("Projectile", (20, 20), self.display,
+                                                   self.fireball_frames,
+                                                   self.fireball_start_flag,
+                                                   self.fireball_end_flag, 1,
+                                                   self.fireball_angle,
+                                                   self.fireball_dmg, self.fireball_base,
+                                                   self.fireball_scale,
+                                                   self.fireball_hitstun,
+                                                   self.color)
+
+        self.fireball_left_attack = hitbox.HitBox("Projectile", (20, 20), self.display,
+                                                  self.fireball_frames,
+                                                  self.fireball_start_flag,
+                                                  self.fireball_end_flag, -1,
+                                                  self.fireball_angle,
+                                                  self.fireball_dmg, self.fireball_base,
+                                                  self.fireball_scale,
+                                                  self.fireball_hitstun,
+                                                  self.color)
+
         # Hitbox groups
         self.all_hitboxes = [self.ng_attack, self.nair_attack1, self.nair_attack2, self.nair_final, self.f_tilt_attack,
                              self.f_air_attack, self.b_attack, self.u_air_attack, self.up_tilt_attack1,
                              self.up_tilt_attack2, self.up_tilt_final, self.d_tilt_attack, self.dair_attack,
                              self.up_special_sweet, self.up_special_sour, self.side_special_attack,
-                             self.down_special_ground_attack, self.down_special_air_attack]
+                             self.down_special_ground_attack, self.down_special_air_attack, self.fireball_right_attack,
+                             self.fireball_left_attack]
         self.active_hitboxes = pygame.sprite.Group()
 
         self.image_skew = (0, 0)
@@ -901,6 +1033,22 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                     self.idle_cycle_left = len(self.idle_frames_left) - 1
                 else:
                     self.idle_cycle_left -= 1
+
+    def neutralSpecialCycleSet(self):
+        if self.direction:
+            if self.neutral_special_cycle_right == 0:
+                self.neutral_special_cycle_right = len(self.neutral_special_frames_right) - 1
+        else:
+            if self.neutral_special_cycle_left == 0:
+                self.neutral_special_cycle_left = len(self.neutral_special_frames_left) - 1
+
+    def countNeutralbCycle(self):
+        if self.direction:
+            if self.neutral_special_cycle_right > 0:
+                self.neutral_special_cycle_right -= 1
+        else:
+            if self.neutral_special_cycle_left > 0:
+                self.neutral_special_cycle_left -= 1
 
     def upspecialCycleSet(self):
         if self.direction:
@@ -1200,7 +1348,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             if not self.on_ground:
                 # Cancel lag and momentum
 
-                if self.up_special_cycle_right > 0 or self.up_special_cycle_left > 0 or self.side_special_cycle_right > 0 or self.side_special_cycle_left > 0 or self.down_special_air_cycle_right > 0 or self.down_special_air_cycle_left > 0:
+                if self.up_special_cycle_right > 0 or self.up_special_cycle_left > 0 or self.side_special_cycle_right > 0 or self.side_special_cycle_left > 0 or self.down_special_air_cycle_right > 0 or self.down_special_air_cycle_left > 0 or self.neutral_special_cycle_right > 0 or self.neutral_special_cycle_left > 0:
                     if self.up_special_cycle_right > 0:
                         self.lag = self.up_special_cycle_right
                     elif self.up_special_cycle_left > 0:
@@ -1213,6 +1361,10 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                         self.lag = self.down_special_air_cycle_right
                     elif self.down_special_air_cycle_left > 0:
                         self.lag = self.down_special_air_cycle_left
+                    elif self.neutral_special_cycle_right > 0:
+                        self.lag = self.neutral_special_cycle_right
+                    elif self.neutral_special_cycle_left > 0:
+                        self.lag = self.neutral_special_cycle_left
                 else:
                     self.lag = 0
 
@@ -1232,7 +1384,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 self.going_down = False
                 # Reset any hitboxes
                 for hitbox in self.all_hitboxes:
-                    if self.active_hitboxes.has(hitbox):
+                    if self.active_hitboxes.has(hitbox) and hitbox is not self.fireball_right_attack and hitbox is not self.fireball_left_attack:
                         self.active_hitboxes.remove(hitbox)
                         hitbox.reset()
                     if hitbox.running:
@@ -1278,6 +1430,12 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 self.image = self.hurt_image_right
             else:
                 self.image = self.hurt_image_left
+        elif self.neutral_special_cycle_right > 0 or self.neutral_special_cycle_left > 0:
+            self.image_skew = self.neutral_special_image_skew
+            if self.neutral_special_cycle_right > 0:
+                self.image = self.neutral_special_frames_right[self.neutral_special_cycle_right]
+            elif self.neutral_special_cycle_left > 0:
+                self.image = self.neutral_special_frames_left[self.neutral_special_cycle_left]
         elif self.up_special_cycle_right > 0 or self.up_special_cycle_left > 0:
             self.image_skew = self.up_special_image_skew
             if self.up_special_cycle_right > 0:
@@ -1605,6 +1763,32 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             else:
                 self.acc.x = -0.5
 
+    def neutralSpecial(self):
+        pressed_keys = pygame.key.get_pressed()
+
+        if pressed_keys[self.special] and not (
+                pressed_keys[self.up] or pressed_keys[self.down] or pressed_keys[self.right] or pressed_keys[
+            self.left]) and self.lag <= 0:
+            self.neutralSpecialCycleSet()
+            self.lag = len(self.neutral_special_frames)
+        elif self.neutral_special_cycle_right == 15 or self.neutral_special_cycle_left == 15:
+            if self.direction:
+                self.fireball_right.start(self.pos.x, self.pos.y)
+                self.fireball_right_attack.update((self.fireball_right.pos[0], self.fireball_right.pos[1] - 20))
+            else:
+                self.fireball_left.start(self.pos.x, self.pos.y)
+                self.fireball_left_attack.update((self.fireball_left.pos[0], self.fireball_left.pos[1] - 20))
+
+        elif (self.fireball_right.running or self.fireball_right_attack.running) and self.active_hitboxes.has(self.fireball_right_attack):
+            self.fireball_right.update()
+            self.fireball_right_attack.update((self.fireball_right.pos[0], self.fireball_right.pos[1] - 20))
+        elif (self.fireball_left.running or self.fireball_left_attack.running) and self.active_hitboxes.has(self.fireball_left_attack):
+            self.fireball_left.update()
+            self.fireball_left_attack.update((self.fireball_left.pos[0], self.fireball_left.pos[1] - 20))
+        else:
+            self.fireball_right_attack.reset()
+            self.fireball_left_attack.reset()
+
     def upSpecial(self):
         pressed_keys = pygame.key.get_pressed()
 
@@ -1700,7 +1884,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             if self.direction:
                 self.down_special_air_attack.update((self.pos.x + 20, self.pos.y))
             else:
-                self.down_special_air_attack.update((self.pos.x , self.pos.y))
+                self.down_special_air_attack.update((self.pos.x, self.pos.y))
 
     def downSpecialAirBoost(self):
         if self.down_special_air_cycle_right == 17 or self.down_special_air_cycle_left == 17:
@@ -1882,7 +2066,6 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         # A list of active hitboxes the opponent has  (Dokill = True)
         shield_hit = pygame.sprite.spritecollide(self.shield_box, opponent_hitboxes, True)
         hit = pygame.sprite.spritecollide(self, opponent_hitboxes, True)
-
         # If one collides with you (at least 1)
         if hit and not shield_hit:
             # Only accounts for the first hitbox you get hit by
@@ -1959,6 +2142,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             self.countSidebCycle()
             self.countDownSpecialGroundCycle()
             self.countDownSpecialAirCycle()
+            self.countNeutralbCycle()
 
         # CONDITIONAL MOVEMENT (CONDITIONAL)
         if not (self.frozen or self.lag or self.hitstun):
@@ -1995,6 +2179,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 self.downSpecialGroundBoost()
                 self.downSpecialAir()
                 self.downSpecialAirBoost()
+                self.neutralSpecial()
                 self.forwardAttack()
                 self.backAttack()
                 self.upAttack()
