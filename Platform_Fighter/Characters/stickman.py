@@ -124,6 +124,27 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.shield_hit = None
         self.crouching = False
 
+        self.flash_percent = 100
+        self.flash_frames_right = [pygame.image.load(path + "Images/Stickman/Flash/Flash %d Reverse.png" % (6 - x // 3)).convert_alpha()
+                                  for x in range(0, 18)]
+
+        self.flash_cycle_right = 0
+
+        self.flash_frames_left = [pygame.transform.flip(pygame.image.load(path + "Images/Stickman/Flash/Flash %d Reverse.png" % (6 - x // 3)).convert_alpha(), True, False)
+                                  for x in range(0, 18)]
+
+        self.flash_cycle_left = 0
+
+        self.flash_hitbox = (80, 80)
+        self.flash_frames = 18
+        self.flash_start_flag = 16
+        self.flash_end_flag = 6
+        self.flash_angle = (0.5, 0.5)
+        self.flash_dmg = 6
+        self.flash_base = 5
+        self.flash_scale = 0.1
+        self.flash_hitstun = 10
+
         self.shield_box = shield.Shield()
 
         self.in_shield = False
@@ -830,6 +851,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.down_special_air_image_skew = (0, 0)
         self.neutral_special_image_skew = (0, 0)
         self.roll_image_skew = (0, 0)
+        self.flash_image_skew = (-15, 15)
 
         self.up_special_sweet_spot = False
 
@@ -959,13 +981,17 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                                                   self.fireball_hitstun,
                                                   self.color)
 
+        self.flash_attack = hitbox.HitBox("Flash", self.flash_hitbox, self.display, self.flash_frames, self.flash_start_flag,
+                                          self.flash_end_flag, 1, self.flash_angle, self.flash_dmg, self.flash_base,
+                                          self.flash_scale, self.flash_hitstun, self.color)
+
         # Hitbox groups
         self.all_hitboxes = [self.ng_attack, self.nair_attack1, self.nair_attack2, self.nair_final, self.f_tilt_attack,
                              self.f_air_attack, self.b_attack, self.u_air_attack, self.up_tilt_attack1,
                              self.up_tilt_attack2, self.up_tilt_final, self.d_tilt_attack, self.dair_attack,
                              self.up_special_sweet, self.up_special_sour, self.side_special_attack,
                              self.down_special_ground_attack, self.down_special_air_attack, self.fireball_right_attack,
-                             self.fireball_left_attack]
+                             self.fireball_left_attack, self.flash_attack]
         self.active_hitboxes = pygame.sprite.Group()
 
         self.image_skew = (0, 0)
@@ -1056,6 +1082,22 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                     self.idle_cycle_left = len(self.idle_frames_left) - 1
                 else:
                     self.idle_cycle_left -= 1
+
+    def flashCycleSet(self):
+        if self.direction:
+            if self.flash_cycle_right == 0:
+                self.flash_cycle_right = len(self.flash_frames_right) - 1
+        else:
+            if self.flash_cycle_left == 0:
+                self.flash_cycle_left = len(self.flash_frames_left) - 1
+
+    def countFlashCycle(self):
+        if self.direction:
+            if self.flash_cycle_right > 0:
+                self.flash_cycle_right -= 1
+        else:
+            if self.flash_cycle_left > 0:
+                self.flash_cycle_left -= 1
 
     def neutralSpecialCycleSet(self):
         if self.direction:
@@ -1315,6 +1357,11 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.invincibility = 100
         self.frozen = self.invincibility - 50
 
+        if self.flash_percent < 85:
+            self.flash_percent += 15
+        else:
+            self.flash_percent = 100
+
     # Respawn conditions
     def respawn(self):
         # If you're in the blastzone
@@ -1489,6 +1536,13 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 self.image = self.hurt_image_right
             else:
                 self.image = self.hurt_image_left
+        elif self.flash_cycle_right > 0 or self.flash_cycle_left > 0:
+            if self.flash_cycle_right > 0:
+                self.image_skew = self.flash_image_skew
+                self.image = self.flash_frames_right[self.flash_cycle_right]
+            elif self.flash_cycle_left > 0:
+                self.image_skew = (-1 * self.flash_image_skew[0], self.flash_image_skew[1])
+                self.image = self.flash_frames_left[self.flash_cycle_left]
         elif self.roll_right_cycle > 0 or self.roll_left_cycle > 0:
             self.image_skew = self.roll_image_skew
             if self.roll_right_cycle > 0:
@@ -1836,6 +1890,27 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 else:
                     self.acc.x = -0.3
 
+    def flash(self):
+        pressed_keys = pygame.key.get_pressed()
+
+        if self.flash_percent == 100 and ((pressed_keys[self.shield] and pressed_keys[self.meter]) or (self.roll_right_cycle > 0 or self.roll_left_cycle > 0) and pressed_keys[self.meter]):
+            self.flash_percent = 0
+            self.lag = len(self.flash_frames_right) + 24
+            self.invincibility = 16
+            self.hitstun = 0
+            self.hitstop = 0
+
+            self.roll_right_cycle = 0
+            self.roll_left_cycle = 0
+
+            self.vel.x = 0
+            self.vel.y = 0
+
+            self.flashCycleSet()
+            self.flash_attack.update((self.pos.x, self.pos.y - 20))
+        elif self.flash_attack.running:
+            self.flash_attack.update((self.pos.x, self.pos.y - 20))
+
     def neutralSpecial(self):
         pressed_keys = pygame.key.get_pressed()
 
@@ -2166,6 +2241,40 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             self.got_hit = True
             self.got_shield = False
 
+            self.nair_cycle_right = 0
+            self.nair_cycle_left = 0
+            self.fair_cycle_right = 0
+            self.fair_cycle_left = 0
+            self.up_air_cycle_right = 0
+            self.up_air_cycle_left = 0
+            self.dair_cycle_right = 0
+            self.dair_cycle_left = 0
+            self.bair_cycle_right = 0
+            self.bair_cycle_left = 0
+
+            self.f_tilt_cycle_right = 0
+            self.f_tilt_cycle_left = 0
+            self.d_tilt_cycle_right = 0
+            self.d_tilt_cycle_left = 0
+            self.up_tilt_cycle_right = 0
+            self.up_tilt_cycle_left = 0
+
+            self.neutral_special_cycle_right = 0
+            self.neutral_special_cycle_left = 0
+            self.side_special_cycle_right = 0
+            self.side_special_cycle_left = 0
+            self.up_special_cycle_right = 0
+            self.up_special_cycle_left = 0
+            self.down_special_ground_cycle_right = 0
+            self.down_special_ground_cycle_left = 0
+            self.down_special_air_cycle_right = 0
+            self.down_special_air_cycle_left = 0
+
+            if self.flash_percent < 80:
+                self.flash_percent += 20
+            else:
+                self.flash_percent = 100
+
             for x in self.all_hitboxes:
                 x.reset()
             self.active_hitboxes.empty()
@@ -2208,12 +2317,15 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.respawn()
         self.endGame()
 
+        self.flash_percent = 100
+
         # COUNTING FUNCTIONS (ALMOST ALWAYS)
         self.countHitstop()
         self.countInvincibility()
         self.countFrozen()
 
         self.shieldPress()
+        self.flash()
 
         if not self.hitstop and not self.hitconfirm:
             self.countLag()
@@ -2222,6 +2334,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             self.countPressedDown()
             self.countPressedLeft()
             self.countPressedRight()
+            self.countFlashCycle()
             self.dashCooldownCount()
             self.countWalkCycle()
             self.countNairCycle()

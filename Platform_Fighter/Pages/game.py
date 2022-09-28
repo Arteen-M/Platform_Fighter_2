@@ -193,6 +193,11 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
             if P1.box.name != "Projectile":
                 P2.hitconfirm = P1.hitstop
 
+            if P2.flash_percent < 90:
+                P2.flash_percent += 10
+            else:
+                P2.flash_percent = 100
+
         if P1.got_shield:
             P1ShieldMusic.play()
             xBack = abs(P1.knockbackFormula(P1.shield_hit.x_component, P1.shield_hit.damage, P1.shield_hit.knockback_scale,
@@ -210,6 +215,11 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
             if P2.box.name != "Projectile":
                 P1.hitconfirm = P2.hitstop
 
+            if P1.flash_percent < 90:
+                P1.flash_percent += 10
+            else:
+                P1.flash_percent = 100
+
         if P2.got_shield:
             P2ShieldMusic.play()
 
@@ -224,8 +234,8 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
             P1.hitconfirm = P1.findHitstop(P2.shield_hit.damage, 0.75)
 
         # Update the graphic with information
-        P1_Graphic.update(P1.percentage, P1.stocks)
-        P2_Graphic.update(P2.percentage, P2.stocks)
+        P1_Graphic.update(P1.percentage, P1.stocks, P1.flash_percent)
+        P2_Graphic.update(P2.percentage, P2.stocks, P2.flash_percent)
 
         # Draw all debug elements
         if debug:
@@ -260,5 +270,7 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
 
     musicObj.stop()
     time.sleep(2)  # Delay, to allow everyone to process
+
+    return
 
 # gameLoop()
