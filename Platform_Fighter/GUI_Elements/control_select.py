@@ -15,7 +15,7 @@ input_list = [K_TAB, K_CLEAR, K_RETURN, K_PAUSE, K_SPACE, K_QUOTE, K_MINUS,
              K_RIGHTBRACKET, K_BACKQUOTE, K_a, K_b, K_c, K_d, K_e, K_f, K_g, K_h, K_i, K_j, K_k,
              K_l, K_m, K_n, K_o, K_p, K_q, K_r, K_s, K_t, K_u, K_v, K_w, K_x, K_y, K_z, K_KP0, K_KP1, K_KP2, K_KP3,
              K_KP4, K_KP5, K_KP6, K_KP7, K_KP8, K_KP9, K_KP_PERIOD, K_KP_DIVIDE, K_KP_MULTIPLY, K_KP_MINUS, K_KP_PLUS,
-             K_KP_ENTER, K_KP_EQUALS, K_UP, K_DOWN, K_RIGHT, K_LEFT, K_RALT, K_LALT]
+             K_KP_ENTER, K_KP_EQUALS, K_UP, K_DOWN, K_RIGHT, K_LEFT, K_RALT, K_LALT, K_BACKSLASH, K_QUOTE]
 
 WIDTH = 800
 HEIGHT = 600
@@ -82,7 +82,7 @@ class controlButton:
 
 # Bunch of buttons arranged specifically
 class controlPanel:
-    def __init__(self, display, controls=(K_LEFT, K_RIGHT, K_UP, K_DOWN, K_h, K_q, K_e), pos=(WIDTH/2, HEIGHT/2)):
+    def __init__(self, display, controls=(K_LEFT, K_RIGHT, K_UP, K_DOWN, K_h, K_q, K_e, K_f), pos=(WIDTH/2, HEIGHT/2)):
         self.controls = controls
         self.pos = pos
         self.display = display
@@ -93,6 +93,7 @@ class controlPanel:
         self.attack = controlButton("Atk", self.controls[4], (self.pos[0] + 120, self.pos[1] - 50), self.display, bigSize=30)
         self.shield = controlButton("Shd", self.controls[5], (self.pos[0] - 60, self.pos[1] - 50), self.display, bigSize=30)
         self.special = controlButton("Spe", self.controls[6], (self.pos[0] + 60, self.pos[1] - 50), self.display, bigSize=30)
+        self.meter = controlButton("Mtr", self.controls[7], (self.pos[0] + 120, self.pos[1] + 50), self.display, bigSize=30)
 
     def update(self):
         self.left.update()
@@ -102,6 +103,7 @@ class controlPanel:
         self.attack.update()
         self.shield.update()
         self.special.update()
+        self.meter.update()
 
     def get_pressed(self, click):
         self.left.get_pressed(click)
@@ -111,6 +113,7 @@ class controlPanel:
         self.attack.get_pressed(click)
         self.shield.get_pressed(click)
         self.special.get_pressed(click)
+        self.meter.get_pressed(click)
 
     # Changing the entire control scheme at once (new name)
     def reInit(self, controls):
@@ -122,6 +125,8 @@ class controlPanel:
         self.attack = controlButton("Atk", self.controls[4], (self.pos[0] + 120, self.pos[1] - 50), self.display, bigSize=30)
         self.shield = controlButton("Shd", self.controls[5], (self.pos[0] - 60, self.pos[1] - 50), self.display, bigSize=30)
         self.special = controlButton("Spe", self.controls[6], (self.pos[0] + 60, self.pos[1] - 50), self.display, bigSize=30)
+        self.meter = controlButton("Mtr", self.controls[7], (self.pos[0] + 120, self.pos[1] + 50), self.display,
+                                    bigSize=30)
 
     def returnControls(self):
-        return [self.left.control, self.right.control, self.up.control, self.down.control, self.attack.control, self.shield.control, self.special.control]
+        return [self.left.control, self.right.control, self.up.control, self.down.control, self.attack.control, self.shield.control, self.special.control, self.meter.control]

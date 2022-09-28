@@ -97,6 +97,9 @@ class Square(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.momentum = 0  # Momentum (after you gain control from hitstun, but your momentum sticks around)
         self.knockback = vec(0, 0)  # Knockback Vector (x and y)
         self.got_hit = False
+        self.shield_box = None
+        self.got_shield = False
+        self.box = None
 
         # Hitboxes for each usable attack
         #                                name      size       display   lag  sf  ef dir  angle    dmg b  s  hitstun  color
@@ -546,7 +549,7 @@ class Square(pygame.sprite.Sprite):  # Inherit from the sprite class
         # If one collides with you (at least 1)
         if hit:
             # Only accounts for the first hitbox you get hit by
-            box = hit[0]
+            self.box = hit[0]
             self.got_hit = True
 
             for x in self.all_hitboxes:
@@ -554,28 +557,28 @@ class Square(pygame.sprite.Sprite):  # Inherit from the sprite class
             self.active_hitboxes.empty()
 
             # Take the percentage damage of the hitbox
-            self.percentage += box.damage
+            self.percentage += self.box.damage
 
             # Take the knockback of the hitbox (individual to x and y)
-            self.knockback.x = self.knockbackFormula(box.x_component, box.damage, box.knockback_scale,
-                                                     box.base_knockback, 1)
-            self.knockback.y = -1 * self.knockbackFormula(box.y_component, box.damage, box.knockback_scale,
-                                                          box.base_knockback, 1)
+            self.knockback.x = self.knockbackFormula(self.box.x_component, self.box.damage, self.box.knockback_scale,
+                                                     self.box.base_knockback, 1)
+            self.knockback.y = -1 * self.knockbackFormula(self.box.y_component, self.box.damage, self.box.knockback_scale,
+                                                          self.box.base_knockback, 1)
 
             # Set your acceleration and velocity (reset and set)
-            self.acc = vec(box.direction * self.knockback.x / 10, self.knockback.y)
-            self.vel = vec(box.direction * self.knockback.x, self.knockback.y)
+            self.acc = vec(self.box.direction * self.knockback.x / 10, self.knockback.y)
+            self.vel = vec(self.box.direction * self.knockback.x, self.knockback.y)
 
             # calculate the players velocity in 1D (not as a vector)
             velocity = math.sqrt((self.knockback.x ** 2) + (self.knockback.y ** 2))
             # Set their hitstun and momentum based on the power of the attack
-            self.hitstun = math.floor(self.hitstunFormula(velocity, box.hitstun, box.damage))
-            self.momentum = math.floor(self.hitstun * math.ceil(box.hitstun) + 1)
+            self.hitstun = math.floor(self.hitstunFormula(velocity, self.box.hitstun, self.box.damage))
+            self.momentum = math.floor(self.hitstun * math.ceil(self.box.hitstun) + 1)
         else:
             self.got_hit = False
 
     # Function containing all the previous ones, to run in one cycle
-    def update(self, hard_floors, soft_floors, under_floors, walls, opponent_hitboxes):
+    def update(self, hard_floors, soft_floors, under_floors, walls, opponent_hitboxes, shield):
         # RESPAWN/END FUNCTIONS (ALWAYS)
         self.respawn()
         self.endGame()

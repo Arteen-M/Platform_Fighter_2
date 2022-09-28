@@ -34,7 +34,7 @@ MOMENTUM_FRIC = 0.01  # Movement Resistance during momentum
 # -------------------------------------------------------------------------
 class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
     def __init__(self, display, color=RED, spawn_position=(WIDTH / 2, HEIGHT / 2),
-                 controls=(K_LEFT, K_RIGHT, K_UP, K_DOWN, K_h, K_q, K_e), stocks=3):
+                 controls=(K_LEFT, K_RIGHT, K_UP, K_DOWN, K_h, K_q, K_e, K_f), stocks=3):
         super().__init__()
         self.surf = pygame.Surface((30, 50))  # Surface (hurtbox) size
         self.image = pygame.image.load(path + "Images/Stickman/stickman.png").convert_alpha()
@@ -82,6 +82,16 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.attack = self.controls[4]
         self.shield = self.controls[5]
         self.special = self.controls[6]
+        self.meter = self.controls[7]
+
+        self.left_bool = False
+        self.right_bool = False
+        self.up_bool = False
+        self.down_bool = False
+        self.attack_bool = False
+        self.shield_bool = False
+        self.special_bool = False
+        self.meter_bool = False
 
         # Jump variables
         self.tapped_up = False  # Detect a jump press (only once per press)
@@ -90,6 +100,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
 
         self.max_dash = 2
         self.num_dash = 2
+        self.dash_cooldown = 0
 
         # Character States
         self.on_ground = False  # On the ground or not
@@ -232,8 +243,9 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
 
         self.fireball_right = hitbox.Projectile(path + "Images/Stickman/Neutral Special/Neutral_B_Projectile.png", 60,
                                                 self.display, 5)
-        self.fireball_left = hitbox.Projectile(path + "Images/Stickman/Neutral Special/Neutral_B_Projectile_reverse.png",
-                                               60, self.display, -5)
+        self.fireball_left = hitbox.Projectile(
+            path + "Images/Stickman/Neutral Special/Neutral_B_Projectile_reverse.png",
+            60, self.display, -5)
 
         # self.fireball_hitbox = (30, 25)
         self.fireball_frames = 80
@@ -793,6 +805,16 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.crouch_image_left = pygame.transform.flip(
             pygame.image.load(path + "Images/Stickman/Crouch/stick_char_crouch-2.png"), True, False).convert_alpha()
 
+        self.roll_right_frames = [
+            pygame.image.load(path + "Images/Stickman/Roll/Roll_right_%d.png" % (13 - x // 2)).convert_alpha() for x in range(2, 24)]
+
+        self.roll_left_frames = [
+            pygame.transform.flip(pygame.image.load(path + "Images/Stickman/Roll/Roll_right_%d.png" % (13 - x // 2)), True, False).convert_alpha() for x in
+            range(2, 24)]
+
+        self.roll_right_cycle = 0
+        self.roll_left_cycle = 0
+
         self.nair_image_skew = (0, 25)
         self.fair_image_skew = (0, 15)
         self.up_air_image_skew = (0, 0)
@@ -807,6 +829,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
         self.down_special_ground_image_skew = (0, 0)
         self.down_special_air_image_skew = (0, 0)
         self.neutral_special_image_skew = (0, 0)
+        self.roll_image_skew = (0, 0)
 
         self.up_special_sweet_spot = False
 
@@ -1242,6 +1265,29 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             if self.bair_cycle_left > 0:
                 self.bair_cycle_left -= 1
 
+    def rollCycleSet(self):
+        if self.direction:
+            if self.roll_right_cycle == 0:
+                self.roll_right_cycle = len(self.roll_right_frames) - 1
+        else:
+            if self.roll_left_cycle == 0:
+                self.roll_left_cycle = len(self.roll_left_frames) - 1
+
+    def countRollCycle(self):
+        if self.direction:
+            if self.roll_right_cycle > 0:
+                self.roll_right_cycle -= 1
+        else:
+            if self.roll_left_cycle > 0:
+                self.roll_left_cycle -= 1
+
+    def setDashCooldown(self):
+        self.dash_cooldown = 20
+
+    def dashCooldownCount(self):
+        if self.dash_cooldown > 0:
+            self.dash_cooldown -= 1
+
     # The formula for knockback (I stole this from SmashWiki)
     def knockbackFormula(self, angle, damage, scale, base, mod):
         velocity = mod * angle * (((((self.percentage / 10) + (self.percentage * (damage / 2) / 20) * (
@@ -1322,17 +1368,42 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
     def dash(self):
         pressed_keys = pygame.key.get_pressed()
         if not self.in_shield:
-            if pressed_keys[self.left] and 8 >= self.pressed_left > 0:
+            if pressed_keys[self.left] and 8 >= self.pressed_left > 0 and self.dash_cooldown == 0:
                 self.vel.x = -1 * self.dash_speed
+                self.vel.y = 0
+                self.setDashCooldown()
+            elif pressed_keys[self.left] and 8 >= self.pressed_left > 0:
                 self.vel.y = 0
             elif pressed_keys[self.left]:
                 self.pressed_left = 10
 
+            if pressed_keys[self.right] and 8 >= self.pressed_right > 0 and self.dash_cooldown == 0:
+                self.vel.x = self.dash_speed
+                self.vel.y = 0
+                self.setDashCooldown()
+            elif pressed_keys[self.right] and 8 >= self.pressed_right > 0:
+                self.vel.y = 0
+            elif pressed_keys[self.right]:
+                self.pressed_right = 10
+
+        else:
+            if pressed_keys[self.left] and 8 >= self.pressed_left > 0:
+                self.rollCycleSet()
+                self.lag = len(self.roll_right_frames)
+                self.vel.x = -1 * self.dash_speed
+                self.vel.y = 0
+            elif pressed_keys[self.left]:
+                self.pressed_left = 10
+                self.pressed_right = 0
+
             if pressed_keys[self.right] and 8 >= self.pressed_right > 0:
+                self.rollCycleSet()
+                self.lag = len(self.roll_right_frames)
                 self.vel.x = self.dash_speed
                 self.vel.y = 0
             elif pressed_keys[self.right]:
                 self.pressed_right = 10
+                self.pressed_left = 0
 
     # def fastFall(self):
     #    if self.going_down:
@@ -1347,26 +1418,9 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             # If you hit the ground and weren't on the ground before
             if not self.on_ground:
                 # Cancel lag and momentum
-
-                if self.up_special_cycle_right > 0 or self.up_special_cycle_left > 0 or self.side_special_cycle_right > 0 or self.side_special_cycle_left > 0 or self.down_special_air_cycle_right > 0 or self.down_special_air_cycle_left > 0 or self.neutral_special_cycle_right > 0 or self.neutral_special_cycle_left > 0:
-                    if self.up_special_cycle_right > 0:
-                        self.lag = self.up_special_cycle_right
-                    elif self.up_special_cycle_left > 0:
-                        self.lag = self.up_special_cycle_left
-                    elif self.side_special_cycle_right > 0:
-                        self.lag = self.side_special_cycle_right
-                    elif self.side_special_cycle_left > 0:
-                        self.lag = self.side_special_cycle_left
-                    elif self.down_special_air_cycle_right > 0:
-                        self.lag = self.down_special_air_cycle_right
-                    elif self.down_special_air_cycle_left > 0:
-                        self.lag = self.down_special_air_cycle_left
-                    elif self.neutral_special_cycle_right > 0:
-                        self.lag = self.neutral_special_cycle_right
-                    elif self.neutral_special_cycle_left > 0:
-                        self.lag = self.neutral_special_cycle_left
-                else:
+                if not (self.up_special_cycle_right > 0 or self.up_special_cycle_left > 0 or self.side_special_cycle_right > 0 or self.side_special_cycle_left > 0 or self.down_special_air_cycle_right > 0 or self.down_special_air_cycle_left > 0 or self.neutral_special_cycle_right > 0 or self.neutral_special_cycle_left > 0 or self.side_special_cycle_right > 0 or self.side_special_cycle_left > 0 or self.roll_right_cycle > 0 or self.roll_left_cycle > 0):
                     self.lag = 0
+                    self.dash_cooldown = 0
 
                     self.nair_cycle_right = 0
                     self.nair_cycle_left = 0
@@ -1379,16 +1433,18 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                     self.bair_cycle_right = 0
                     self.bair_cycle_left = 0
 
-                self.momentum = 0
+                    self.momentum = 0
+
+                    # Reset any hitboxes
+                    for hitbox in self.all_hitboxes:
+                        if self.active_hitboxes.has(
+                                hitbox) and hitbox is not self.fireball_right_attack and hitbox is not self.fireball_left_attack:
+                            self.active_hitboxes.remove(hitbox)
+                            hitbox.reset()
+                        if hitbox.running and hitbox is not self.fireball_right_attack and hitbox is not self.fireball_left_attack:
+                            hitbox.reset()
 
                 self.going_down = False
-                # Reset any hitboxes
-                for hitbox in self.all_hitboxes:
-                    if self.active_hitboxes.has(hitbox) and hitbox is not self.fireball_right_attack and hitbox is not self.fireball_left_attack:
-                        self.active_hitboxes.remove(hitbox)
-                        hitbox.reset()
-                    if hitbox.running:
-                        hitbox.reset()
 
             # If you hit the ground, you are on the ground
             self.on_ground = True
@@ -1397,14 +1453,16 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             if self.on_ground:
                 # Cancel lag
                 # Reset any hitboxes
-                if self.up_special_cycle_right <= 0 and self.up_special_cycle_left <= 0:
+                if self.up_special_cycle_right <= 0 and self.up_special_cycle_left <= 0 and self.side_special_cycle_right <= 0 and self.side_special_cycle_left <= 0 or self.roll_right_cycle <= 0 or self.roll_left_cycle <= 0:
                     self.lag = 0
+                    self.dash_cooldown = 0
 
                     for hitbox in self.all_hitboxes:
-                        if self.active_hitboxes.has(hitbox):
+                        if self.active_hitboxes.has(
+                                hitbox) and hitbox is not self.fireball_right_attack and hitbox is not self.fireball_left_attack:
                             self.active_hitboxes.remove(hitbox)
                             hitbox.reset()
-                        if hitbox.running:
+                        if hitbox.running and hitbox is not self.fireball_right_attack and hitbox is not self.fireball_left_attack:
                             hitbox.reset()
 
             # You are now not on the ground
@@ -1425,29 +1483,41 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 self.direction = True
 
     def imageUpdate(self):
+        # Hitstun takes priority
         if self.hitstun or self.hitstop:
             if self.direction:
                 self.image = self.hurt_image_right
             else:
                 self.image = self.hurt_image_left
+        elif self.roll_right_cycle > 0 or self.roll_left_cycle > 0:
+            self.image_skew = self.roll_image_skew
+            if self.roll_right_cycle > 0:
+                self.image = self.roll_right_frames[self.roll_right_cycle]
+            elif self.roll_left_cycle > 0:
+                self.image = self.roll_left_frames[self.roll_left_cycle]
+        # SPECIALS
+        # Neutral Special
         elif self.neutral_special_cycle_right > 0 or self.neutral_special_cycle_left > 0:
             self.image_skew = self.neutral_special_image_skew
             if self.neutral_special_cycle_right > 0:
                 self.image = self.neutral_special_frames_right[self.neutral_special_cycle_right]
             elif self.neutral_special_cycle_left > 0:
                 self.image = self.neutral_special_frames_left[self.neutral_special_cycle_left]
+        # Up Special
         elif self.up_special_cycle_right > 0 or self.up_special_cycle_left > 0:
             self.image_skew = self.up_special_image_skew
             if self.up_special_cycle_right > 0:
                 self.image = self.up_special_frames_right[self.up_special_cycle_right]
             elif self.up_special_cycle_left > 0:
                 self.image = self.up_special_frames_left[self.up_special_cycle_left]
+        # Side Special
         elif self.side_special_cycle_right > 0 or self.side_special_cycle_left > 0:
             self.image_skew = self.side_special_image_skew
             if self.side_special_cycle_right > 0:
                 self.image = self.side_special_frames_right[self.side_special_cycle_right]
             elif self.side_special_cycle_left > 0:
                 self.image = self.side_special_frames_left[self.side_special_cycle_left]
+        # Down Special
         elif self.down_special_ground_cycle_right > 0 or self.down_special_ground_cycle_left > 0:
             self.image_skew = self.down_special_ground_image_skew
             if self.down_special_ground_cycle_right > 0:
@@ -1460,6 +1530,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 self.image = self.down_special_air_frames_right[self.down_special_air_cycle_right]
             elif self.down_special_air_cycle_left > 0:
                 self.image = self.down_special_air_frames_left[self.down_special_air_cycle_left]
+
         elif self.nair_cycle_right > 0 or self.nair_cycle_left > 0:
             self.image_skew = self.nair_image_skew
             if self.nair_cycle_right > 0:
@@ -1521,6 +1592,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             else:
                 self.image = self.air_image_left
         elif self.crouching:
+            self.image_skew = self.crouch_image_skew
             if self.direction:
                 self.image = self.crouch_image_right
             else:
@@ -1749,19 +1821,20 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             self.vel.x = 0
             self.in_shield = True
             if self.direction:
-                self.shield_box.update((15, 60), (self.pos.x + 30, self.pos.y), True)
+                self.shield_box.update((15, 60), (self.pos.x + 20, self.pos.y), True)
             else:
-                self.shield_box.update((15, 60), (self.pos.x - 30, self.pos.y), False)
+                self.shield_box.update((15, 60), (self.pos.x - 20, self.pos.y), False)
         else:
             self.shield_box.update((0, 0), (0, 0), None)
             self.in_shield = False
 
     def shieldPush(self, opponent_shield):
-        if pygame.sprite.collide_rect(self, opponent_shield):
-            if opponent_shield.direction:
-                self.acc.x = 0.5
-            else:
-                self.acc.x = -0.5
+        if opponent_shield is not None:
+            if pygame.sprite.collide_rect(self, opponent_shield):
+                if opponent_shield.direction:
+                    self.acc.x = 0.3
+                else:
+                    self.acc.x = -0.3
 
     def neutralSpecial(self):
         pressed_keys = pygame.key.get_pressed()
@@ -1779,10 +1852,13 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
                 self.fireball_left.start(self.pos.x, self.pos.y)
                 self.fireball_left_attack.update((self.fireball_left.pos[0], self.fireball_left.pos[1] - 20))
 
-        elif (self.fireball_right.running or self.fireball_right_attack.running) and self.active_hitboxes.has(self.fireball_right_attack):
+    def projectile(self):
+        if (self.fireball_right.running or self.fireball_right_attack.running) and self.active_hitboxes.has(
+                self.fireball_right_attack):
             self.fireball_right.update()
             self.fireball_right_attack.update((self.fireball_right.pos[0], self.fireball_right.pos[1] - 20))
-        elif (self.fireball_left.running or self.fireball_left_attack.running) and self.active_hitboxes.has(self.fireball_left_attack):
+        elif (self.fireball_left.running or self.fireball_left_attack.running) and self.active_hitboxes.has(
+                self.fireball_left_attack):
             self.fireball_left.update()
             self.fireball_left_attack.update((self.fireball_left.pos[0], self.fireball_left.pos[1] - 20))
         else:
@@ -1843,9 +1919,9 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
     def sideSpecialBoost(self):
         if self.side_special_cycle_left == 25 or self.side_special_cycle_right == 25:
             if self.direction:
-                self.vel.x = self.dash_speed
+                self.vel.x = self.dash_speed + 1
             else:
-                self.vel.x = -1 * self.dash_speed
+                self.vel.x = -1 * self.dash_speed - 1
 
     def downSpecialGround(self):
         pressed_keys = pygame.key.get_pressed()
@@ -2061,6 +2137,23 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             else:
                 self.d_tilt_attack.update((self.pos.x - 10, self.pos.y - 10))
 
+    def roll(self):
+        pressed_keys = pygame.key.get_pressed()
+        if pressed_keys[self.shield] and not self.on_ground and not self.lag:
+            self.rollCycleSet()
+            self.lag = 2 * len(self.roll_right_frames)
+            if pressed_keys[self.left]:
+                self.vel.x = self.dash_speed / -2
+            elif pressed_keys[self.right]:
+                self.vel.x = self.dash_speed / 2
+            elif pressed_keys[self.up]:
+                self.acc.y = self.jump_acc
+            elif pressed_keys[self.down]:
+                self.acc.y = -1 * self.jump_acc
+        elif self.roll_right_cycle > 0 or self.roll_left_cycle > 0:
+            if self.roll_right_cycle == 17 or self.roll_left_cycle == 17:
+                self.invincibility = 10
+
     # Detects and executes when you get hit
     def getHit(self, opponent_hitboxes):
         # A list of active hitboxes the opponent has  (Dokill = True)
@@ -2129,6 +2222,7 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             self.countPressedDown()
             self.countPressedLeft()
             self.countPressedRight()
+            self.dashCooldownCount()
             self.countWalkCycle()
             self.countNairCycle()
             self.countUairCycle()
@@ -2143,6 +2237,8 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
             self.countDownSpecialGroundCycle()
             self.countDownSpecialAirCycle()
             self.countNeutralbCycle()
+            self.projectile()
+            self.countRollCycle()
 
         # CONDITIONAL MOVEMENT (CONDITIONAL)
         if not (self.frozen or self.lag or self.hitstun):
@@ -2169,22 +2265,24 @@ class Stickman(pygame.sprite.Sprite):  # Inherit from the sprite class
 
         if not self.frozen:
             if not self.hitstun:
-                # ATTACKS (CONDITIONAL)
-                # The order of the attacks indicates their priority in activation
-                self.upSpecial()
-                self.upSpecialBoost()
-                self.sideSpecial()
-                self.sideSpecialBoost()
-                self.downSpecialGround()
-                self.downSpecialGroundBoost()
-                self.downSpecialAir()
-                self.downSpecialAirBoost()
-                self.neutralSpecial()
-                self.forwardAttack()
-                self.backAttack()
-                self.upAttack()
-                self.downAttack()
-                self.neutralAttack()
+                self.roll()
+                if not self.in_shield:
+                    # ATTACKS (CONDITIONAL)
+                    # The order of the attacks indicates their priority in activation
+                    self.upSpecial()
+                    self.upSpecialBoost()
+                    self.sideSpecial()
+                    self.sideSpecialBoost()
+                    self.downSpecialGround()
+                    self.downSpecialGroundBoost()
+                    self.downSpecialAir()
+                    self.downSpecialAirBoost()
+                    self.neutralSpecial()
+                    self.forwardAttack()
+                    self.backAttack()
+                    self.upAttack()
+                    self.downAttack()
+                    self.neutralAttack()
             # HITBOXES (CONDITIONAL)
             self.activeHitboxesSetter()
             # GETTING HIT (CONDITIONAL)

@@ -147,6 +147,43 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
         # display.fill(BLACK)  # Clear the screen
         bg.update()
 
+        """
+        key_pressed = pygame.key.get_pressed()
+        for x in range(len(P1.controls)):
+            if key_pressed[P1.controls[x]]:
+                if x == 0:
+                    P1.left_bool = True
+                if x == 1:
+                    P1.right_bool = True
+                if x == 2:
+                    P1.up_bool = True
+                if x == 3:
+                    P1.down_bool = True
+                if x == 4:
+                    P1.attack_bool = True
+                if x == 5:
+                    P1.shield_bool = True
+                if x == 6:
+                    P1.special_bool = True
+
+        for x in range(len(P2.controls)):
+            if key_pressed[P2.controls[x]]:
+                if x == 0:
+                    P2.left_bool = True
+                elif x == 1:
+                    P2.right_bool = True
+                elif x == 2:
+                    P2.up_bool = True
+                elif x == 3:
+                    P2.down_bool = True
+                elif x == 4:
+                    P2.attack_bool = True
+                elif x == 5:
+                    P2.shield_bool = True
+                elif x == 6:
+                    P2.special_bool = True
+        """
+
         # Update with floors, walls and hitboxes
         P1.update(hard_floors, soft_floors, under_floors, walls, P2.active_hitboxes, P2.shield_box)
         P2.update(hard_floors, soft_floors, under_floors, walls, P1.active_hitboxes, P1.shield_box)

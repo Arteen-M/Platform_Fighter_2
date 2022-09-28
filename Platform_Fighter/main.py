@@ -22,6 +22,7 @@
 from Pages import game
 from Pages import welcome
 from Pages import character_select
+import pygame
 
 # --------------------------------------------------------------------------
 # Variable Definitions
