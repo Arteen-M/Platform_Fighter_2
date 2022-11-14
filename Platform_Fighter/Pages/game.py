@@ -190,7 +190,7 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
 
         if P1.got_hit:
             P2HitMusic.play()
-            if P1.box.name != "Projectile":
+            if P1.box.name[0] != "Projectile":
                 P2.hitconfirm = P1.hitstop
 
             if P2.flash_percent < 90:
@@ -207,12 +207,14 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
 
             P2.vel.x = xBack
 
+            # print(1)
+            # P2.attack_identifiers = P1.shield_hit
             P2.hitconfirm = P1.findHitstop(P1.shield_hit.damage, 0.75)
             P1.hitconfirm = P1.findHitstop(P1.shield_hit.damage, 0.75)
 
         if P2.got_hit:
             P1HitMusic.play()
-            if P2.box.name != "Projectile":
+            if P2.box.name[0] != "Projectile":
                 P1.hitconfirm = P2.hitstop
 
             if P1.flash_percent < 90:
@@ -230,6 +232,7 @@ def gameLoop(characters, controls, skins, times=3, stock=3, debug=False):
 
             P1.vel.x = xBack
 
+            # P1.attack_identifiers = P2.shield_hit
             P2.hitconfirm = P1.findHitstop(P2.shield_hit.damage, 0.75)
             P1.hitconfirm = P1.findHitstop(P2.shield_hit.damage, 0.75)
 

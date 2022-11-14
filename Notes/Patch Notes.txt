@@ -20,3 +20,9 @@ Entire Game:
 - Added Music
     - Character Select Music
     - Main Game Music
+
+Added New Character (Stickman):
+    - Kept all basic properties of square
+    - Added new attacks and special moves
+    - Added Special Meter and Moves
+    - Added Cancels from Down -> Side
